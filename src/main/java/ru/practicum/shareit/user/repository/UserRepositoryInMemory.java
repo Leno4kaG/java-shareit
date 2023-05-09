@@ -11,7 +11,7 @@ import java.util.*;
 @Component
 public class UserRepositoryInMemory implements UserRepository {
 
-    private static Map<Long, User> userMap = new HashMap<>();
+    private Map<Long, User> userMap = new HashMap<>();
 
     private static long id = 1;
 
@@ -31,9 +31,6 @@ public class UserRepositoryInMemory implements UserRepository {
 
     @Override
     public User updateUser(User user) {
-        if (!userMap.containsValue(user)) {
-            throw new UserNotFoundException(user.getId());
-        }
         userMap.put(user.getId(), user);
         log.info("Update user with name {}", user.getName());
         return user;

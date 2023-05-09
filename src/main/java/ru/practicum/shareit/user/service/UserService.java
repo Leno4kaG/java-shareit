@@ -19,40 +19,40 @@ public class UserService {
     private final UserRepositoryInMemory repositoryInMemory;
     private final UserMapper userMapper;
 
-    public User createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto) {
         validateEmail(userDto.getEmail(), 0);
         User user = userMapper.fromDto(userDto);
-        return repositoryInMemory.createUser(user);
+        return userMapper.toDto(repositoryInMemory.createUser(user));
     }
 
-    public User getUserById(long id) {
-        return repositoryInMemory.getUserById(id);
+    public UserDto getUserById(long id) {
+        return userMapper.toDto(repositoryInMemory.getUserById(id));
     }
 
-    public User updateUser(long id, UserDto userDto) {
+    public UserDto updateUser(long id, UserDto userDto) {
         User user = repositoryInMemory.getUserById(id);
         String name = userDto.getName();
         String email = userDto.getEmail();
         if (name != null) {
-            user.setName(userDto.getName());
+            user.setName(name);
         }
         if (email != null) {
             validateEmail(email, id);
-            user.setEmail(userDto.getEmail());
+            user.setEmail(email);
         }
-        return repositoryInMemory.updateUser(user);
+        return userMapper.toDto(repositoryInMemory.updateUser(user));
     }
 
     public void deleteUserById(long id) {
         repositoryInMemory.deleteUser(id);
     }
 
-    public List<User> getAllUsers() {
-        return repositoryInMemory.getAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userMapper.toDtoList(repositoryInMemory.getAllUsers());
     }
 
     private void validateEmail(String email, long id) {
-        for (User user : getAllUsers()) {
+        for (UserDto user : getAllUsers()) {
             if (user.getEmail().equals(email) && user.getId() != id) {
                 log.error("User with email {} уже зарегистрирован", user.getEmail());
                 throw new ValidationException();

@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class ItemRepositoryInMemory implements ItemRepository {
 
-    private static Map<Long, Item> itemMap = new HashMap<>();
+    private Map<Long, Item> itemMap = new HashMap<>();
 
     private static long id = 1;
 
@@ -28,9 +28,6 @@ public class ItemRepositoryInMemory implements ItemRepository {
 
     @Override
     public Item updateItem(Item item) {
-        if (!itemMap.containsValue(item)) {
-            throw new ItemNotFoundException();
-        }
         itemMap.put(item.getId(), item);
         return item;
     }
@@ -50,7 +47,7 @@ public class ItemRepositoryInMemory implements ItemRepository {
         List<Item> items = new ArrayList<>(itemMap.values());
         List<Item> userItem = new ArrayList<>();
         for (Item item : items) {
-            if (item.getOwner() == userId) {
+            if (item.getOwner().getId() == userId) {
                 userItem.add(item);
             }
         }
@@ -61,9 +58,7 @@ public class ItemRepositoryInMemory implements ItemRepository {
     public List<Item> searchItems(String text, long userId) {
         List<Item> items = new ArrayList<>(itemMap.values());
         List<Item> foundItem = new ArrayList<>();
-        if (text.isEmpty()) {
-            return foundItem;
-        }
+
         for (Item item : items) {
             if (item.isAvailable() && (item.getName().toLowerCase().contains(text)
                     || item.getDescription().toLowerCase().contains(text))) {

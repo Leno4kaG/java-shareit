@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
@@ -24,29 +25,29 @@ public class ItemService {
 
     public ItemDto createItem(ItemDto itemDto, long userId) {
         Item item = itemMapper.fromDto(itemDto);
-        userRepository.getUserById(userId);
-        item.setOwner(userId);
+        User user = userRepository.getUserById(userId);
+        item.setOwner(user);
         itemDto.setId(itemRepository.createItem(item).getId());
         return itemDto;
     }
 
     public ItemDto updateItem(ItemDto itemDto, long userId) {
-        userRepository.getUserById(userId);
+        User user = userRepository.getUserById(userId);
         Item item = itemRepository.getItem(itemDto.getId(), userId);
-        if (item.getOwner() != userId) {
+        if (user.getId() != userId) {
             throw new ItemNotFoundException(item.getId());
         }
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean isAvailable = itemDto.getAvailable();
         if (name != null) {
-            item.setName(itemDto.getName());
+            item.setName(name);
         }
         if (description != null) {
-            item.setDescription(itemDto.getDescription());
+            item.setDescription(description);
         }
         if (isAvailable != null) {
-            item.setAvailable(itemDto.getAvailable());
+            item.setAvailable(isAvailable);
         }
         itemRepository.updateItem(item);
         itemDto = itemMapper.toDto(item);

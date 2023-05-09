@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,7 +45,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam String text, @NotNull @RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> searchItems(@RequestParam(name = "text") String text, @NotNull @RequestHeader("X-Sharer-User-Id") long userId) {
+        if (text == null || text.isBlank()) {
+            return Collections.emptyList();
+        }
         return itemService.searchItems(text, userId);
     }
 
