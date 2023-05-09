@@ -32,9 +32,9 @@ public class ItemService {
     }
 
     public ItemDto updateItem(ItemDto itemDto, long userId) {
-        User user = userRepository.getUserById(userId);
+        userRepository.getUserById(userId);
         Item item = itemRepository.getItem(itemDto.getId(), userId);
-        if (user.getId() != userId) {
+        if (item.getOwner().getId() != userId) {
             throw new ItemNotFoundException(item.getId());
         }
         String name = itemDto.getName();
