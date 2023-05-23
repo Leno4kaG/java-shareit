@@ -3,11 +3,11 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryInMemory;
+import ru.practicum.shareit.user.repository.UserRepositoryDB;
 
 import java.util.List;
 
@@ -16,47 +16,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepositoryInMemory repositoryInMemory;
+    private final UserRepositoryDB repositoryInMemory;
     private final UserMapper userMapper;
 
     public UserDto createUser(UserDto userDto) {
-        validateEmail(userDto.getEmail(), 0);
         User user = userMapper.fromDto(userDto);
-        return userMapper.toDto(repositoryInMemory.createUser(user));
+        return userMapper.toDto(repositoryInMemory.save(user));
     }
 
     public UserDto getUserById(long id) {
-        return userMapper.toDto(repositoryInMemory.getUserById(id));
+        return userMapper.toDto(repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
 
     public UserDto updateUser(long id, UserDto userDto) {
-        User user = repositoryInMemory.getUserById(id);
+        User user = repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         String name = userDto.getName();
         String email = userDto.getEmail();
         if (name != null) {
             user.setName(name);
         }
         if (email != null) {
-            validateEmail(email, id);
             user.setEmail(email);
         }
-        return userMapper.toDto(repositoryInMemory.updateUser(user));
+        return userMapper.toDto(repositoryInMemory.save(user));
     }
 
     public void deleteUserById(long id) {
-        repositoryInMemory.deleteUser(id);
+        repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        repositoryInMemory.deleteById(id);
     }
 
     public List<UserDto> getAllUsers() {
-        return userMapper.toDtoList(repositoryInMemory.getAllUsers());
+        return userMapper.toDtoList(repositoryInMemory.findAll());
     }
 
-    private void validateEmail(String email, long id) {
-        for (UserDto user : getAllUsers()) {
-            if (user.getEmail().equals(email) && user.getId() != id) {
-                log.error("User with email {} уже зарегистрирован", user.getEmail());
-                throw new ValidationException();
-            }
-        }
-    }
 }

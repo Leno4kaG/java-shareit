@@ -60,7 +60,7 @@ public class ItemRepositoryInMemory implements ItemRepository {
         List<Item> foundItem = new ArrayList<>();
 
         for (Item item : items) {
-            if (item.isAvailable() && (item.getName().toLowerCase().contains(text)
+            if (item.getAvailable() && (item.getName().toLowerCase().contains(text)
                     || item.getDescription().toLowerCase().contains(text))) {
                 foundItem.add(item);
             }
