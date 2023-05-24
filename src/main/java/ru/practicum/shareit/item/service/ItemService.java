@@ -27,7 +27,9 @@ import ru.practicum.shareit.user.repository.UserRepositoryDB;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -77,7 +79,8 @@ public class ItemService {
 
     @Transactional
     public List<ItemWithBooking> getAllItems(long userId) {
-        List<Item> items = itemRepository.findAllByOwner(getOwner(userId));
+        List<Item> items = itemRepository.findAllByOwner(getOwner(userId)).stream()
+                .sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
         return getItemsWithBooking(items, userId);
     }
 
