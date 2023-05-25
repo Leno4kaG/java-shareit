@@ -105,12 +105,10 @@ public class ItemService {
         return commentDto;
     }
 
-    @Transactional(readOnly = true)
     private User getOwner(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
-    @Transactional(readOnly = true)
     private List<ItemWithBooking> getItemsWithBooking(List<Item> items, Long userId) {
         log.info("Items {}", items);
         List<ItemWithBooking> withBookings = new ArrayList<>();
@@ -154,7 +152,7 @@ public class ItemService {
         return withBookings;
     }
 
-    @Transactional(readOnly = true)
+
     private Item getItem(Long itemId, Long userId, ItemDto itemDto) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         if (item.getOwner().getId() != userId) {
@@ -175,7 +173,7 @@ public class ItemService {
         return item;
     }
 
-    @Transactional(readOnly = true)
+
     private ItemWithBooking getItemWithBooking(Item item, Long userId) {
         List<CommentDto> comments = commentMapper.toListDto(commentRepository.findAllByItem(item));
         List<ItemWithBooking> bookings = getItemsWithBooking(List.of(item), userId);

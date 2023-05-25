@@ -119,7 +119,7 @@ public class BookingService {
         return bookingMapper.toListDto(bookings);
     }
 
-    @Transactional(readOnly = true)
+
     private List<Booking> getBookings(BookingState state, User booker) {
         Sort sort = Sort.by("start").descending();
         LocalDateTime date = LocalDateTime.now();
@@ -140,7 +140,6 @@ public class BookingService {
         }
     }
 
-    @Transactional(readOnly = true)
     private List<Booking> getBookingsByItem(BookingState state, List<Item> items) {
         List<Booking> bookings = new ArrayList<>();
         Sort sort = Sort.by("start").descending();
@@ -181,7 +180,6 @@ public class BookingService {
         }
     }
 
-    @Transactional(readOnly = true)
     private User findUser(Long userId) {
         return userRepositoryDB.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
