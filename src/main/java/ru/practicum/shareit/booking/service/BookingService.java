@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingRequest;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -44,8 +44,8 @@ public class BookingService {
     private final ItemMapper itemMapper;
 
     @Transactional
-    public BookingDto createBooking(Long userId, BookingRequest bookingRequest) {
-        final long itemId = bookingRequest.getItemId();
+    public BookingDto createBooking(Long userId, BookingRequestDto bookingRequestDto) {
+        final long itemId = bookingRequestDto.getItemId();
         User user = findUser(userId);
         log.info("User {}", user);
         Item item = itemRepositoryDB.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
@@ -58,8 +58,8 @@ public class BookingService {
             log.error("Available = false");
             throw new BookingValidationException();
         }
-        validationDate(bookingRequest.getStart(), bookingRequest.getEnd());
-        BookingDto bookingDto = bookingMapper.toBookingDto(bookingRequest);
+        validationDate(bookingRequestDto.getStart(), bookingRequestDto.getEnd());
+        BookingDto bookingDto = bookingMapper.toBookingDto(bookingRequestDto);
         bookingDto.setStatus(BookingStatus.WAITING);
         bookingDto.setBooker(userMapper.toDto(user));
         bookingDto.setItem(itemMapper.toDto(item));
@@ -74,12 +74,12 @@ public class BookingService {
         findUser(userId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
         Item item = booking.getItem();
-        if (item.getOwner().getId() != userId) {
+        if (userId != item.getOwner().getId()) {
             log.error("User id != {} owner in item !!!", userId);
             throw new BookingNotFoundException(bookingId);
         }
         if (approved) {
-            if (booking.getStatus().equals(BookingStatus.APPROVED)) {
+            if (BookingStatus.APPROVED.equals(booking.getStatus())) {
                 log.error("Status approved !!!");
                 throw new BookingValidationException();
             }

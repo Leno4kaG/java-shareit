@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.model.BookingRequest;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
@@ -26,9 +26,9 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                    @Valid @RequestBody BookingRequest bookingRequest) {
+                                                    @Valid @RequestBody BookingRequestDto bookingRequestDto) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(userId, bookingRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(userId, bookingRequestDto));
     }
 
     @PatchMapping("/{bookingId}")
