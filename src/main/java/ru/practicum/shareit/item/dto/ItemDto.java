@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
 
     private Long id;
-    @NotEmpty
+    @NotBlank(message = "Название товара не должно быть пустым.")
     private String name;
-    @NotEmpty
+    @NotBlank(message = "Описание товара не должно быть пустым.")
     private String description;
-    @NotNull
+    @NotNull(message = "Статус товара доступности является обязательным параметром.")
     private Boolean available;
 }

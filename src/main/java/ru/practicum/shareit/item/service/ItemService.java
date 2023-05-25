@@ -16,7 +16,6 @@ import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.CommentValidationException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -49,10 +48,6 @@ public class ItemService {
 
     @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
-        if (itemDto.getName().isBlank()) {
-            log.error("Наименование товара пустое!!");
-            throw new ValidationException();
-        }
         Item item = itemMapper.fromDto(itemDto);
         log.info("Item {}", item);
         User owner = getOwner(userId);
@@ -70,31 +65,28 @@ public class ItemService {
         return getItemWithBooking(item, userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ItemWithBooking getItem(long itemId, long userId) {
         getOwner(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         return getItemWithBooking(item, userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ItemWithBooking> getAllItems(long userId) {
-        List<Item> items = itemRepository.findAllByOwner(getOwner(userId)).stream()
+        List<Item> items = itemRepository.findAllByOwnerId(userId).stream()
                 .sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
         return getItemsWithBooking(items, userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String text, long userId) {
         return itemMapper.toListDto(itemRepository.searchItems(text));
     }
 
     @Transactional
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
-        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
-            log.error("Коммент не должен быть пустым!!");
-            throw new CommentValidationException();
-        }
+
         Sort sort = Sort.by("start").descending();
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -113,36 +105,56 @@ public class ItemService {
         return commentDto;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private User getOwner(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private List<ItemWithBooking> getItemsWithBooking(List<Item> items, Long userId) {
+        log.info("Items {}", items);
         List<ItemWithBooking> withBookings = new ArrayList<>();
+        if (items.isEmpty()) {
+            return withBookings;
+        }
         LocalDateTime date = LocalDateTime.now();
         Sort sort = Sort.by("start").descending();
+        List<Booking> bookings = bookingRepository.findBookingByItemIn(items, sort).stream()
+                .filter(b -> b.getStatus().equals(BookingStatus.APPROVED)).collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findAllByItemIn(items);
         for (Item item : items) {
-            Booking lastBooking = bookingRepository.findBookingByItemIdAndStatusAndStartBefore(item.getId(),
-                            BookingStatus.APPROVED, date, sort)
-                    .stream().findFirst().orElse(null);
-            Booking nextBooking = bookingRepository.findBookingByItemIdAndStatusAndStartAfter(item.getId(),
-                            BookingStatus.APPROVED, date, Sort.by("start").ascending())
-                    .stream().findFirst().orElse(null);
+
+            List<Booking> lastBookings = bookings.stream().filter(i -> i.getStart().isBefore(date)
+                            && i.getItem().equals(item))
+                    .collect(Collectors.toList());
+
+            List<Booking> nextBookings = bookings.stream().filter(i -> i.getStart().isAfter(date)
+                            && i.getItem().equals(item))
+                    .collect(Collectors.toList());
             ItemWithBooking itemWithBooking = itemMapper.toItemWithBooking(item);
+
+            Booking lastBooking = null;
+            Booking nextBooking = null;
+            if (!lastBookings.isEmpty()) {
+                lastBooking = lastBookings.get(0);
+            }
+            if (!nextBookings.isEmpty()) {
+                nextBooking = nextBookings.get(nextBookings.size() - 1);
+            }
             log.info("Last booking {}", lastBooking);
             log.info("Next booking {}", nextBooking);
             if (userId.equals(item.getOwner().getId())) {
                 itemWithBooking.setNextBooking(bookingMapper.toBookingForItem(nextBooking));
                 itemWithBooking.setLastBooking(bookingMapper.toBookingForItem(lastBooking));
             }
+            itemWithBooking.setComments(commentMapper.toListDto(comments.stream()
+                    .filter(c -> c.getItem().equals(item)).collect(Collectors.toList())));
             withBookings.add(itemWithBooking);
         }
         return withBookings;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private Item getItem(Long itemId, Long userId, ItemDto itemDto) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         if (item.getOwner().getId() != userId) {
@@ -163,7 +175,7 @@ public class ItemService {
         return item;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private ItemWithBooking getItemWithBooking(Item item, Long userId) {
         List<CommentDto> comments = commentMapper.toListDto(commentRepository.findAllByItem(item));
         List<ItemWithBooking> bookings = getItemsWithBooking(List.of(item), userId);

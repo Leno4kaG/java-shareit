@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,33 +24,33 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> createItem(@NotNull @RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                               @Valid @RequestBody ItemDto itemDto) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(itemService.createItem(itemDto, userId));
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemWithBooking> updateItemDto(@NotNull @RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<ItemWithBooking> updateItemDto(@RequestHeader("X-Sharer-User-Id") long userId,
                                                          @RequestBody ItemDto itemDto, @PathVariable long itemId) {
         itemDto.setId(itemId);
         return ResponseEntity.ok(itemService.updateItem(itemDto, userId));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemWithBooking> getItem(@NotNull @RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<ItemWithBooking> getItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                                    @PathVariable long itemId) {
         return ResponseEntity.ok(itemService.getItem(itemId, userId));
     }
 
     @GetMapping
-    public List<ItemWithBooking> getAllItems(@NotNull @RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemWithBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAllItems(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam(name = "text") String text,
-                                     @NotNull @RequestHeader("X-Sharer-User-Id") long userId) {
+                                     @RequestHeader("X-Sharer-User-Id") long userId) {
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
         }
@@ -59,9 +58,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@NotNull @RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") long userId,
                                                  @PathVariable long itemId,
-                                                 @RequestBody CommentDto commentDto) {
+                                                 @Valid @RequestBody CommentDto commentDto) {
         return ResponseEntity.status(HttpStatus.OK).body(itemService.addComment(userId, itemId, commentDto));
     }
 

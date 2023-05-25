@@ -4,7 +4,7 @@ import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-item-requests.
@@ -23,5 +23,5 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id")
     private User request;
 
-    private LocalDate created;
+    private LocalDateTime created;
 }

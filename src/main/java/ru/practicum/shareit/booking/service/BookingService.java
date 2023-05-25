@@ -22,7 +22,9 @@ import ru.practicum.shareit.user.repository.UserRepositoryDB;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -90,7 +92,7 @@ public class BookingService {
         return bookingMapper.toDto(booking);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public BookingDto getBooking(Long userId, Long bookingId) {
         findUser(userId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
@@ -103,28 +105,29 @@ public class BookingService {
         return bookingMapper.toDto(booking);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForCurrentUser(Long userId, BookingState state) {
         User user = findUser(userId);
         return bookingMapper.toListDto(getBookings(state, user));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state) {
         User owner = findUser(userId);
-        List<Item> itemList = itemRepositoryDB.findAllByOwner(owner);
+        List<Item> itemList = itemRepositoryDB.findAllByOwnerId(owner.getId());
         List<Booking> bookings = getBookingsByItem(state, itemList);
         return bookingMapper.toListDto(bookings);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private List<Booking> getBookings(BookingState state, User booker) {
         Sort sort = Sort.by("start").descending();
         LocalDateTime date = LocalDateTime.now();
         if (BookingState.ALL.equals(state)) {
             return bookingRepository.findAllByBookerId(booker.getId(), sort);
         } else if (BookingState.CURRENT.equals(state)) {
-            return bookingRepository.findAllCurrent(booker);
+            return bookingRepository.findAllCurrent(booker).stream()
+                    .sorted(Comparator.comparing(Booking::getId)).collect(Collectors.toList());
         } else if (BookingState.PAST.equals(state)) {
             return bookingRepository.findAllByBookerIdAndEndBefore(booker.getId(), date, sort);
         } else if (BookingState.FUTURE.equals(state)) {
@@ -137,7 +140,7 @@ public class BookingService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private List<Booking> getBookingsByItem(BookingState state, List<Item> items) {
         List<Booking> bookings = new ArrayList<>();
         Sort sort = Sort.by("start").descending();
@@ -178,7 +181,7 @@ public class BookingService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private User findUser(Long userId) {
         return userRepositoryDB.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
