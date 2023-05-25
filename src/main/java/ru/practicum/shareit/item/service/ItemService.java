@@ -125,11 +125,11 @@ public class ItemService {
         for (Item item : items) {
 
             List<Booking> lastBookings = bookings.stream().filter(i -> i.getStart().isBefore(date)
-                            && i.getItem().equals(item))
+                            && i.getItem().getId().equals(item.getId()))
                     .collect(Collectors.toList());
 
             List<Booking> nextBookings = bookings.stream().filter(i -> i.getStart().isAfter(date)
-                            && i.getItem().equals(item))
+                            && i.getItem().getId().equals(item.getId()))
                     .collect(Collectors.toList());
             ItemWithBooking itemWithBooking = itemMapper.toItemWithBooking(item);
 
