@@ -1,13 +1,16 @@
 package ru.practicum.shareit.request.model;
 
 import lombok.Data;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * TODO Sprint add-item-requests.
+ * Таблица запросов для добавления вещей.
  */
 @Data
 @Entity
@@ -24,4 +27,6 @@ public class ItemRequest {
     private User request;
 
     private LocalDateTime created;
+    @Transient
+    private final List<ItemDto> items = new ArrayList<>();
 }

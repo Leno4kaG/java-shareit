@@ -6,16 +6,22 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * TODO Sprint add-controllers.
+ * Модель запроса товара/вещи
  */
 @Data
 public class ItemDto {
 
     private Long id;
+
     @NotBlank(message = "Название товара не должно быть пустым.")
     private String name;
+
     @NotBlank(message = "Описание товара не должно быть пустым.")
     private String description;
+
     @NotNull(message = "Статус товара доступности является обязательным параметром.")
     private Boolean available;
+
+    private Long requestId;
+
 }

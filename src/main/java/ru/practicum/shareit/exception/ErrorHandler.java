@@ -37,6 +37,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDto handleUserNotFound(ItemRequestNotFoundException e) {
+        log.error("Item request with id {} not found", e.getItemRequestId());
+        return new ErrorDto("Запрос на добавление товара/вещи не найден");
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorDto handleUserNotFound(ValidationException e) {
         log.error(e.getMessage());
@@ -48,6 +55,13 @@ public class ErrorHandler {
     public ErrorDto handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         return new ErrorDto("Ошибка валидации");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDto handleMethodArgumentNotValidException(PageParamException e) {
+        log.error(e.getMessage());
+        return new ErrorDto("Ошибка валидации параметров страницы");
     }
 
     @ExceptionHandler

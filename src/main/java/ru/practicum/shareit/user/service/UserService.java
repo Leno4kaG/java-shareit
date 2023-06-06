@@ -17,23 +17,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepositoryDB repositoryInMemory;
+    private final UserRepositoryDB userRepositoryDB;
     private final UserMapper userMapper;
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.fromDto(userDto);
-        return userMapper.toDto(repositoryInMemory.save(user));
+        return userMapper.toDto(userRepositoryDB.save(user));
     }
 
     @Transactional(readOnly = true)
     public UserDto getUserById(long id) {
-        return userMapper.toDto(repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
+        return userMapper.toDto(userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
 
     @Transactional
     public UserDto updateUser(long id, UserDto userDto) {
-        User user = repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        User user = userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         String name = userDto.getName();
         String email = userDto.getEmail();
         if (name != null) {
@@ -42,18 +42,18 @@ public class UserService {
         if (email != null) {
             user.setEmail(email);
         }
-        return userMapper.toDto(repositoryInMemory.save(user));
+        return userMapper.toDto(userRepositoryDB.save(user));
     }
 
     @Transactional
     public void deleteUserById(long id) {
-        repositoryInMemory.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        repositoryInMemory.deleteById(id);
+        userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        userRepositoryDB.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
-        return userMapper.toDtoList(repositoryInMemory.findAll());
+        return userMapper.toDtoList(userRepositoryDB.findAll());
     }
 
 }

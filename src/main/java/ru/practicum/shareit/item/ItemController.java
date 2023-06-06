@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -44,17 +45,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemWithBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getAllItems(userId);
+    public List<ItemWithBooking> getAllItems(@Validated @RequestParam(name = "from", required = false) Integer from,
+                                             @Validated @RequestParam(name = "size", required = false) Integer size,
+                                             @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getAllItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam(name = "text") String text,
+    public List<ItemDto> searchItems(@Validated @RequestParam(name = "from", required = false) Integer from,
+                                     @Validated @RequestParam(name = "size", required = false) Integer size,
+                                     @RequestParam(name = "text") String text,
                                      @RequestHeader("X-Sharer-User-Id") long userId) {
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemService.searchItems(text, userId);
+        return itemService.searchItems(text, userId, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

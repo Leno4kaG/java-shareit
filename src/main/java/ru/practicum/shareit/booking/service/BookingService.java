@@ -6,9 +6,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.repository.ItemRepositoryDB;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class BookingService {
     private final UserMapper userMapper;
 
     private final ItemMapper itemMapper;
+
+    private final PageParamValidation<BookingDto> pageParamValidation;
 
     @Transactional
     public BookingDto createBooking(Long userId, BookingRequestDto bookingRequestDto) {
@@ -106,17 +109,17 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsForCurrentUser(Long userId, BookingState state) {
+    public List<BookingDto> getBookingsForCurrentUser(Long userId, BookingState state, Integer from, Integer size) {
         User user = findUser(userId);
-        return bookingMapper.toListDto(getBookings(state, user));
+        return pageParamValidation.getListWithPageParam(from, size, bookingMapper.toListDto(getBookings(state, user)));
     }
 
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state) {
+    public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state, Integer from, Integer size) {
         User owner = findUser(userId);
         List<Item> itemList = itemRepositoryDB.findAllByOwnerId(owner.getId());
         List<Booking> bookings = getBookingsByItem(state, itemList);
-        return bookingMapper.toListDto(bookings);
+        return pageParamValidation.getListWithPageParam(from, size, bookingMapper.toListDto(bookings));
     }
 
 
@@ -159,7 +162,8 @@ public class BookingService {
             }
             if (BookingState.WAITING.equals(state) || BookingState.REJECTED.equals(state)) {
 
-                bookings.addAll(bookingRepository.findBookingByItemIdAndStatus(item.getId(), BookingStatus.valueOf(state.name()), sort));
+                bookings.addAll(bookingRepository.findBookingByItemIdAndStatus(item.getId(),
+                        BookingStatus.valueOf(state.name()), sort));
             }
         }
         return bookings;

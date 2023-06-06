@@ -15,14 +15,18 @@ import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.CommentValidationException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,11 +50,24 @@ public class ItemService {
 
     private final CommentMapper commentMapper;
 
+    private final ItemRequestRepository itemRequestRepository;
+
+    private final PageParamValidation<ItemWithBooking> pageParamValidation;
+
+    private final PageParamValidation<ItemDto> pageParamValid;
+
     @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
         Item item = itemMapper.fromDto(itemDto);
         log.info("Item {}", item);
         User owner = getOwner(userId);
+        Long itemReqId = itemDto.getRequestId();
+        if (itemReqId != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new ItemRequestNotFoundException(itemReqId));
+            item.setRequest(itemRequest);
+            itemDto.setRequestId(itemReqId);
+        }
         item.setOwner(owner);
         itemDto.setId(itemRepository.save(item).getId());
         return itemDto;
@@ -73,15 +90,15 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemWithBooking> getAllItems(long userId) {
+    public List<ItemWithBooking> getAllItems(long userId, Integer from, Integer size) {
         List<Item> items = itemRepository.findAllByOwnerId(userId).stream()
                 .sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
-        return getItemsWithBooking(items, userId);
+        return pageParamValidation.getListWithPageParam(from, size, getItemsWithBooking(items, userId));
     }
 
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItems(String text, long userId) {
-        return itemMapper.toListDto(itemRepository.searchItems(text));
+    public List<ItemDto> searchItems(String text, long userId, Integer from, Integer size) {
+        return pageParamValid.getListWithPageParam(from, size, itemMapper.toListDto(itemRepository.searchItems(text)));
     }
 
     @Transactional
@@ -91,7 +108,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         List<Booking> bookings = bookingRepository.findAllByItemId(item.getId(), sort);
-        if (bookings.stream().anyMatch(b -> b.getBooker().equals(user) && b.getEnd().isBefore(LocalDateTime.now()))) {
+        if (bookings.stream().anyMatch(b -> b.getBooker().getId() == userId && b.getEnd().isBefore(LocalDateTime.now()))) {
             commentDto.setAuthorName(user.getName());
             commentDto.setCreated(LocalDateTime.now());
             Comment comment = commentMapper.fromDto(commentDto);
@@ -109,8 +126,8 @@ public class ItemService {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
-    private List<ItemWithBooking> getItemsWithBooking(List<Item> items, Long userId) {
-        log.info("Items {}", items);
+    public List<ItemWithBooking> getItemsWithBooking(List<Item> items, Long userId) {
+        log.info("Items size {}", items.size());
         List<ItemWithBooking> withBookings = new ArrayList<>();
         if (items.isEmpty()) {
             return withBookings;
