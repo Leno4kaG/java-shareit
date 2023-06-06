@@ -52,7 +52,6 @@ class ItemRequestControllerTest {
                 .build();
     }
 
-    private final static String ITEM_REQ_URL = "/requests";
 
     @Test
     void createRequestWhen_200_OK() throws Exception {
@@ -61,7 +60,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenReturn(itemRequestDto);
 
-        mockMvc.perform(post(ITEM_REQ_URL)
+        mockMvc.perform(post("/requests")
                         .content(objectMapper.writeValueAsString(itemRequestDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -80,7 +79,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(post(ITEM_REQ_URL)
+        mockMvc.perform(post("/requests")
                         .content(objectMapper.writeValueAsString(itemRequestDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -96,7 +95,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(post(ITEM_REQ_URL)
+        mockMvc.perform(post("/requests")
                         .content(objectMapper.writeValueAsString(itemRequestDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -112,7 +111,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequestsForOwner(anyLong()))
                 .thenReturn(List.of(itemRequestDto));
 
-        mockMvc.perform(get(ITEM_REQ_URL)
+        mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -129,7 +128,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequestsForOwner(anyLong()))
                 .thenThrow(ItemRequestNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL)
+        mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -143,7 +142,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequestsForOwner(anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL)
+        mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -158,7 +157,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequests(anyLong(), any(), any()))
                 .thenReturn(List.of(itemRequestDto));
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/all")
+        mockMvc.perform(get("/requests/all")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -177,7 +176,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequests(anyLong(), any(), any()))
                 .thenThrow(ItemRequestNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/all")
+        mockMvc.perform(get("/requests/all")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -193,7 +192,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequests(anyLong(), any(), any()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/all")
+        mockMvc.perform(get("/requests/all")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -210,7 +209,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getItemRequestById(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/{requestId}", 1)
+        mockMvc.perform(get("/requests/{requestId}", 1)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -227,7 +226,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getItemRequestById(anyLong(), anyLong()))
                 .thenThrow(ItemRequestNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/{requestId}", 1)
+        mockMvc.perform(get("/requests/{requestId}", 1)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -241,7 +240,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getItemRequestById(anyLong(), anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_REQ_URL + "/{requestId}", 1)
+        mockMvc.perform(get("/requests/{requestId}", 1)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))

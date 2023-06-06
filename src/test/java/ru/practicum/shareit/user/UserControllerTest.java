@@ -50,7 +50,6 @@ class UserControllerTest {
                 .build();
     }
 
-    private final static String USER_URL = "/users";
 
     @Test
     void createUserWhen_200_OK() throws Exception {
@@ -59,7 +58,7 @@ class UserControllerTest {
         when(userService.createUser(any()))
                 .thenReturn(userDto);
 
-        mockMvc.perform(post(USER_URL)
+        mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -77,7 +76,7 @@ class UserControllerTest {
         when(userService.createUser(any()))
                 .thenThrow(UserNotFoundException.class);
 
-        mockMvc.perform(post(USER_URL)
+        mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -92,7 +91,7 @@ class UserControllerTest {
         when(userService.createUser(any()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(post(USER_URL)
+        mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +106,7 @@ class UserControllerTest {
         when(userService.getUserById(anyLong()))
                 .thenReturn(userDto);
 
-        mockMvc.perform(get(USER_URL + "/{id}", 1)
+        mockMvc.perform(get("/users/{id}", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -123,7 +122,7 @@ class UserControllerTest {
         when(userService.getUserById(anyLong()))
                 .thenThrow(UserNotFoundException.class);
 
-        mockMvc.perform(get(USER_URL + "/{id}", 1)
+        mockMvc.perform(get("/users/{id}", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -136,7 +135,7 @@ class UserControllerTest {
         when(userService.getUserById(anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(USER_URL + "/{id}", 1)
+        mockMvc.perform(get("/users/{id}", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
@@ -150,7 +149,7 @@ class UserControllerTest {
         when(userService.updateUser(anyLong(), any()))
                 .thenReturn(userDto);
 
-        mockMvc.perform(patch(USER_URL + "/{id}", 1L)
+        mockMvc.perform(patch("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -168,7 +167,7 @@ class UserControllerTest {
         when(userService.updateUser(anyLong(), any()))
                 .thenThrow(UserNotFoundException.class);
 
-        mockMvc.perform(patch(USER_URL + "/{id}", 1L)
+        mockMvc.perform(patch("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -183,7 +182,7 @@ class UserControllerTest {
         when(userService.updateUser(anyLong(), any()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(patch(USER_URL + "/{id}", 1L)
+        mockMvc.perform(patch("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -197,7 +196,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         doNothing().when(userService).deleteUserById(anyLong());
 
-        mockMvc.perform(delete(USER_URL + "/{id}", 1L)
+        mockMvc.perform(delete("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -211,7 +210,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         doThrow(UserNotFoundException.class).when(userService).deleteUserById(anyLong());
 
-        mockMvc.perform(delete(USER_URL + "/{id}", 1L)
+        mockMvc.perform(delete("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -225,7 +224,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         doThrow(RuntimeException.class).when(userService).deleteUserById(anyLong());
 
-        mockMvc.perform(delete(USER_URL + "/{id}", 1L)
+        mockMvc.perform(delete("/users/{id}", 1L)
                         .content(objectMapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -240,7 +239,7 @@ class UserControllerTest {
         when(userService.getAllUsers())
                 .thenReturn(List.of(userDto));
 
-        mockMvc.perform(get(USER_URL)
+        mockMvc.perform(get("/users")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -256,7 +255,7 @@ class UserControllerTest {
         when(userService.getAllUsers())
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(USER_URL)
+        mockMvc.perform(get("/users")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())

@@ -51,7 +51,6 @@ class ItemControllerTest {
                 .build();
     }
 
-    private final static String ITEM_URL = "/items";
 
     @Test
     void createItemWhen_data_correct_201_ok() throws Exception {
@@ -60,7 +59,7 @@ class ItemControllerTest {
         when(itemService.createItem(any(ItemDto.class), anyLong()))
                 .thenReturn(itemDto);
 
-        mockMvc.perform(post(ITEM_URL)
+        mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -80,7 +79,7 @@ class ItemControllerTest {
         when(itemService.createItem(any(ItemDto.class), anyLong()))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(post(ITEM_URL)
+        mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -96,7 +95,7 @@ class ItemControllerTest {
         when(itemService.createItem(any(ItemDto.class), anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(post(ITEM_URL)
+        mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -113,7 +112,7 @@ class ItemControllerTest {
         when(itemService.updateItem(any(ItemDto.class), anyLong()))
                 .thenReturn(itemWithBooking);
 
-        mockMvc.perform(patch(ITEM_URL + "/{itemId}", itemDto.getId())
+        mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -134,7 +133,7 @@ class ItemControllerTest {
         when(itemService.updateItem(any(ItemDto.class), anyLong()))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(patch(ITEM_URL + "/{itemId}", itemDto.getId())
+        mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -150,7 +149,7 @@ class ItemControllerTest {
         when(itemService.updateItem(any(ItemDto.class), anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(patch(ITEM_URL + "/{itemId}", itemDto.getId())
+        mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
                         .content(objectMapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -166,7 +165,7 @@ class ItemControllerTest {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenReturn(itemWithBooking);
 
-        mockMvc.perform(get(ITEM_URL + "/{itemId}", itemWithBooking.getId())
+        mockMvc.perform(get("/items/{itemId}", itemWithBooking.getId())
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -185,7 +184,7 @@ class ItemControllerTest {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_URL + "/{itemId}", itemWithBooking.getId())
+        mockMvc.perform(get("/items/{itemId}", itemWithBooking.getId())
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -199,7 +198,7 @@ class ItemControllerTest {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_URL + "/{itemId}", itemWithBooking.getId())
+        mockMvc.perform(get("/items/{itemId}", itemWithBooking.getId())
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -213,7 +212,7 @@ class ItemControllerTest {
         when(itemService.getAllItems(anyLong(), any(), any()))
                 .thenReturn(List.of(itemWithBooking));
 
-        mockMvc.perform(get(ITEM_URL)
+        mockMvc.perform(get("/items")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -233,7 +232,7 @@ class ItemControllerTest {
         when(itemService.getAllItems(anyLong(), any(), any()))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_URL)
+        mockMvc.perform(get("/items")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -248,7 +247,7 @@ class ItemControllerTest {
         when(itemService.getAllItems(anyLong(), any(), any()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_URL)
+        mockMvc.perform(get("/items")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -264,7 +263,7 @@ class ItemControllerTest {
         when(itemService.searchItems(anyString(), anyLong(), any(), any()))
                 .thenReturn(List.of(itemDto));
 
-        mockMvc.perform(get(ITEM_URL + "/search")
+        mockMvc.perform(get("/items/search")
                         .param("from", "0")
                         .param("size", "2")
                         .param("text", "test")
@@ -284,7 +283,7 @@ class ItemControllerTest {
         when(itemService.searchItems(anyString(), anyLong(), any(), any()))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(get(ITEM_URL + "/search")
+        mockMvc.perform(get("/items/search")
                         .param("from", "0")
                         .param("size", "2")
                         .param("text", "test")
@@ -300,7 +299,7 @@ class ItemControllerTest {
         when(itemService.searchItems(anyString(), anyLong(), any(), any()))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(get(ITEM_URL + "/search")
+        mockMvc.perform(get("/items/search")
                         .param("from", "0")
                         .param("size", "2")
                         .param("text", "test")
@@ -319,7 +318,7 @@ class ItemControllerTest {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class)))
                 .thenReturn(commentDto);
 
-        mockMvc.perform(post(ITEM_URL + "/{itemId}/comment", itemId)
+        mockMvc.perform(post("/items/{itemId}/comment", itemId)
                         .content(objectMapper.writeValueAsString(commentDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -339,7 +338,7 @@ class ItemControllerTest {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class)))
                 .thenThrow(ItemNotFoundException.class);
 
-        mockMvc.perform(post(ITEM_URL + "/{itemId}/comment", itemId)
+        mockMvc.perform(post("/items/{itemId}/comment", itemId)
                         .content(objectMapper.writeValueAsString(commentDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -356,7 +355,7 @@ class ItemControllerTest {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class)))
                 .thenThrow(RuntimeException.class);
 
-        mockMvc.perform(post(ITEM_URL + "/{itemId}/comment", itemId)
+        mockMvc.perform(post("/items/{itemId}/comment", itemId)
                         .content(objectMapper.writeValueAsString(commentDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)

@@ -55,7 +55,6 @@ class BookingControllerTest {
                 .build();
     }
 
-    private final static String BOOKING_URL = "/bookings";
 
     @Test
     void createBookingTest_when_correct_data_201_ok() throws Exception {
@@ -64,7 +63,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
                 .thenReturn(bookingDto);
 
-        mockMvc.perform(post(BOOKING_URL)
+        mockMvc.perform(post("/bookings")
                         .content(objectMapper.writeValueAsString(BookingTestData.getBookinReqDto()))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -84,7 +83,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
                 .thenThrow(BookingNotFoundException.class);
 
-        mockMvc.perform(post(BOOKING_URL)
+        mockMvc.perform(post("/bookings")
                         .content(objectMapper.writeValueAsString(BookingTestData.getBookinReqDto()))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -100,7 +99,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
                 .thenThrow(BookingException.class);
 
-        mockMvc.perform(post(BOOKING_URL)
+        mockMvc.perform(post("/bookings")
                         .content(objectMapper.writeValueAsString(BookingTestData.getBookinReqDto()))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -120,7 +119,7 @@ class BookingControllerTest {
         when(bookingService.updateBooking(anyLong(), anyLong(), any(Boolean.class)))
                 .thenReturn(bookingDto);
 
-        mockMvc.perform(patch(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(patch("/bookings/{bookingId}", bookingId)
                         .param("approved", "true")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -140,7 +139,7 @@ class BookingControllerTest {
         when(bookingService.updateBooking(anyLong(), anyLong(), any(Boolean.class)))
                 .thenThrow(BookingNotFoundException.class);
 
-        mockMvc.perform(patch(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(patch("/bookings/{bookingId}", bookingId)
                         .param("approved", "true")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -157,7 +156,7 @@ class BookingControllerTest {
         when(bookingService.updateBooking(anyLong(), anyLong(), any(Boolean.class)))
                 .thenThrow(BookingException.class);
 
-        mockMvc.perform(patch(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(patch("/bookings/{bookingId}", bookingId)
                         .param("approved", "true")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -174,7 +173,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBooking(anyLong(), anyLong()))
                 .thenReturn(bookingDto);
-        mockMvc.perform(get(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(get("/bookings/{bookingId}", bookingId)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -192,7 +191,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBooking(anyLong(), anyLong()))
                 .thenThrow(BookingNotFoundException.class);
-        mockMvc.perform(get(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(get("/bookings/{bookingId}", bookingId)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +206,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBooking(anyLong(), anyLong()))
                 .thenThrow(BookingException.class);
-        mockMvc.perform(get(BOOKING_URL + "/{bookingId}", bookingId)
+        mockMvc.perform(get("/bookings/{bookingId}", bookingId)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -225,7 +224,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForCurrentUser(anyLong(), any(BookingState.class), any(), any()))
                 .thenReturn(bookingDtoList);
-        mockMvc.perform(get(BOOKING_URL)
+        mockMvc.perform(get("/bookings")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -241,7 +240,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForCurrentUser(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(BookingNotFoundException.class);
-        mockMvc.perform(get(BOOKING_URL)
+        mockMvc.perform(get("/bookings")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -257,7 +256,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForCurrentUser(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(PageParamException.class);
-        mockMvc.perform(get(BOOKING_URL)
+        mockMvc.perform(get("/bookings")
                         .param("from", "0")
                         .param("size", "-1")
                         .header("X-Sharer-User-Id", 1)
@@ -273,7 +272,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForCurrentUser(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(BookingException.class);
-        mockMvc.perform(get(BOOKING_URL)
+        mockMvc.perform(get("/bookings")
                         .param("from", "0")
                         .param("size", "-1")
                         .header("X-Sharer-User-Id", 1)
@@ -292,7 +291,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForAllItems(anyLong(), any(BookingState.class), any(), any()))
                 .thenReturn(bookingDtoList);
-        mockMvc.perform(get(BOOKING_URL + "/owner")
+        mockMvc.perform(get("/bookings/owner")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -308,7 +307,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForAllItems(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(BookingNotFoundException.class);
-        mockMvc.perform(get(BOOKING_URL + "/owner")
+        mockMvc.perform(get("/bookings/owner")
                         .param("from", "0")
                         .param("size", "2")
                         .header("X-Sharer-User-Id", 1)
@@ -323,7 +322,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForAllItems(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(PageParamException.class);
-        mockMvc.perform(get(BOOKING_URL + "/owner")
+        mockMvc.perform(get("/bookings/owner")
                         .param("from", "0")
                         .param("size", "-1")
                         .header("X-Sharer-User-Id", 1)
@@ -338,7 +337,7 @@ class BookingControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForAllItems(anyLong(), any(BookingState.class), any(), any()))
                 .thenThrow(BookingException.class);
-        mockMvc.perform(get(BOOKING_URL + "/owner")
+        mockMvc.perform(get("/bookings/owner")
                         .param("from", "0")
                         .param("size", "1")
                         .header("X-Sharer-User-Id", 1)
