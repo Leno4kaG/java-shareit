@@ -8,9 +8,6 @@ public class BookingNotFoundException extends RuntimeException {
         this.bookingId = bookingId;
     }
 
-    public BookingNotFoundException(String message) {
-        super(message);
-    }
 
     public Long getBookingId() {
         return this.bookingId;

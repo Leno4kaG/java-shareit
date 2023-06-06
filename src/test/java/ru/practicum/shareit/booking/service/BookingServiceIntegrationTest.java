@@ -13,6 +13,7 @@ import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
+import ru.practicum.shareit.exception.BookingValidationException;
 import ru.practicum.shareit.exception.PageParamException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -20,10 +21,12 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -40,6 +43,38 @@ public class BookingServiceIntegrationTest {
     private ItemRequestService itemRequestService;
     @Autowired
     private ItemService itemService;
+
+    @Test
+    void createBooking() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        BookingDto bookingDto = bookingService.createBooking(userDto1.getId(), bookingRequestDto);
+        assertEquals(bookingDto.getBooker().getId(), userDto1.getId());
+    }
+
+    @Test
+    void createBookingValidationError() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        bookingRequestDto.setEnd(LocalDateTime.now().minusMinutes(5));
+
+        assertThrows(BookingValidationException.class,
+                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+        bookingRequestDto.setEnd(bookingRequestDto.getEnd());
+        assertThrows(BookingValidationException.class,
+                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+        bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(40));
+        assertThrows(BookingValidationException.class,
+                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+    }
 
     @Test
     void getBookingsForCurrentUserTest() {

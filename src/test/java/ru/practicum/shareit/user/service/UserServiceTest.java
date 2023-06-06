@@ -5,8 +5,9 @@ import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +20,8 @@ import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
-    private UserRepositoryDB userRepository = mock(UserRepositoryDB.class);
-    private UserMapper userMapper = mock(UserMapper.class);
+    private UserRepository userRepository = mock(UserRepository.class);
+    private UserMapper userMapper = mock(UserMapperImpl.class);
 
     private UserService userService = new UserService(userRepository, userMapper);
 
@@ -73,7 +74,7 @@ class UserServiceTest {
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(user);
-        when(userMapper.toDto(any())).thenReturn(userDto);
+        when(userMapper.toDto(any())).thenCallRealMethod();
 
         UserDto result = userService.updateUser(user.getId(), userDto);
 

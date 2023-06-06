@@ -7,9 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
+import ru.practicum.shareit.exception.CommentValidationException;
 import ru.practicum.shareit.exception.PageParamException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
@@ -42,14 +44,36 @@ public class ItemServiceIntegrationTest {
     @Test
     void getAllItemsTest() {
         UserDto userDto = userService.createUser(UserTestData.getUserDto());
+
         itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+
         ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+
         List<ItemWithBooking> items = itemService.getAllItems(userDto.getId(), null, null);
         assertThat(items.get(0).getId(), equalTo(item.getId()));
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+
+        List<ItemWithBooking> items1 = itemService.getAllItems(userDto.getId(), null, 1);
+        assertThat(items1.size(), equalTo(1));
+        ItemDto item1 = itemService.createItem(ItemTestData.getItemDto(), userDto1.getId());
+        itemRequestService.createRequest(userDto1.getId(), ItemRequestTestData.getItemReqDto());
+        List<ItemWithBooking> items2 = itemService.getAllItems(userDto.getId(), null, 1);
+        assertThat(items2.size(), equalTo(0));
+        assertThrows(PageParamException.class,
+                () -> itemService.getAllItems(userDto.getId(), 0, 0));
         assertThrows(PageParamException.class,
                 () -> itemService.getAllItems(userDto.getId(), -100, null));
         assertThrows(PageParamException.class,
                 () -> itemService.getAllItems(userDto.getId(), 0, 0));
+    }
 
+    @Test
+    void addCommentTest() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+
+        assertThrows(CommentValidationException.class,
+                () -> itemService.addComment(userDto.getId(), item.getId(), new CommentDto()));
     }
 }

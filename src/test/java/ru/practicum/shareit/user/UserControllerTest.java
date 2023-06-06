@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -67,6 +68,21 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+    }
+
+    @Test
+    void createUserWhen_409_error() throws Exception {
+        UserDto userDto = UserTestData.getUserDto();
+        objectMapper.registerModule(new JavaTimeModule());
+        when(userService.createUser(any()))
+                .thenThrow(ValidationException.class);
+
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andDo(print());
     }
 
     @Test

@@ -37,4 +37,11 @@ public class UserTestData {
         return user;
     }
 
+    public static UserDto getUserForMapper() {
+        UserDto user = new UserDto();
+        user.setId(1);
+        user.setName("Test user");
+        user.setEmail("test@email");
+        return user;
+    }
 }

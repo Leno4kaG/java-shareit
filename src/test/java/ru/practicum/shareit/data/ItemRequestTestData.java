@@ -24,4 +24,23 @@ public class ItemRequestTestData {
         itemRequest.setCreated(LocalDateTime.now());
         return itemRequest;
     }
+
+    public static ItemRequestDto getItemReqDtoWithBooking() {
+        ItemRequestDto itemRequest = new ItemRequestDto();
+        itemRequest.setId(1);
+        itemRequest.setRequestorId(1L);
+        itemRequest.setDescription("Item request test");
+        itemRequest.setCreated(LocalDateTime.now());
+        return itemRequest;
+    }
+
+    public static ItemRequest getItemReqWithBooking() {
+
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setId(1);
+        itemRequest.setRequest(UserTestData.getUser());
+        itemRequest.setDescription("Item request test");
+        itemRequest.setCreated(LocalDateTime.now());
+        return itemRequest;
+    }
 }

@@ -7,16 +7,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -30,12 +32,15 @@ class RepositoryTest {
     @Autowired
     BookingRepository bookingRepository;
     @Autowired
-    UserRepositoryDB userRepository;
+    UserRepository userRepository;
     @Autowired
-    ItemRepositoryDB itemRepository;
+    ItemRepository itemRepository;
 
     @Autowired
     ItemRequestRepository itemRequestRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
 
     @Test
     void findAllCurrentBooking() {
@@ -79,5 +84,24 @@ class RepositoryTest {
         Sort sort = Sort.by("created").descending();
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestId(itemRequest.getId(), sort);
         assertEquals(List.of(itemRequest), itemRequests);
+    }
+
+    @Test
+    void findAllByItem() {
+        User user = userRepository.save(UserTestData.getUser());
+        Item item = ItemTestData.getItem();
+        item.setOwner(user);
+        ItemRequest itemRequest = ItemRequestTestData.getItemReq();
+        itemRequest.setRequest(user);
+        itemRequest = itemRequestRepository.save(itemRequest);
+        item.setRequest(itemRequest);
+        item = itemRepository.save(item);
+        Comment comment = ItemTestData.getComment();
+        comment.setAuthor(user);
+        comment.setItem(item);
+        comment = commentRepository.save(comment);
+        List<Comment> comments = commentRepository.findAllByItem(item);
+
+        assertEquals(List.of(comment), comments);
     }
 }

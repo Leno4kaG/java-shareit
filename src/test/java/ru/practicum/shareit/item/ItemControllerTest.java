@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.data.ItemTestData;
+import ru.practicum.shareit.exception.CommentValidationException;
 import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -328,6 +329,23 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
                 .andExpect(jsonPath("$.text", is(commentDto.getText())))
                 .andExpect(jsonPath("$.authorName", is(commentDto.getAuthorName())));
+    }
+
+    @Test
+    void addCommentWhen_400_ERROR() throws Exception {
+        CommentDto commentDto = ItemTestData.getCommentDto();
+        objectMapper.registerModule(new JavaTimeModule());
+        Long itemId = 1L;
+        when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class)))
+                .thenThrow(CommentValidationException.class);
+
+        mockMvc.perform(post("/items/{itemId}/comment", itemId)
+                        .content(objectMapper.writeValueAsString(commentDto))
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
     }
 
     @Test

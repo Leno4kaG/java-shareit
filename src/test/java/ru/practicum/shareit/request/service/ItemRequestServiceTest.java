@@ -12,14 +12,14 @@ import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +33,10 @@ import static org.mockito.Mockito.when;
 class ItemRequestServiceTest {
 
     private ItemRequestRepository requestRepository = mock(ItemRequestRepository.class);
-    private UserRepositoryDB userRepository = mock(UserRepositoryDB.class);
+    private UserRepository userRepository = mock(UserRepository.class);
     private ItemRequestMapper requestMapper = mock(ItemRequestMapper.class);
 
-    private ItemRepositoryDB itemRepository = mock(ItemRepositoryDB.class);
+    private ItemRepository itemRepository = mock(ItemRepository.class);
 
     private ItemService itemService = mock(ItemService.class);
 

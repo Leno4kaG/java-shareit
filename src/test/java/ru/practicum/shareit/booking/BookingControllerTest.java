@@ -17,10 +17,7 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.data.BookingTestData;
-import ru.practicum.shareit.exception.BookingException;
-import ru.practicum.shareit.exception.BookingNotFoundException;
-import ru.practicum.shareit.exception.ErrorHandler;
-import ru.practicum.shareit.exception.PageParamException;
+import ru.practicum.shareit.exception.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -78,6 +75,22 @@ class BookingControllerTest {
     }
 
     @Test
+    void createBookingTest_when_correct_data_400_error() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+        when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
+                .thenThrow(BookingValidationException.class);
+
+        mockMvc.perform(post("/bookings")
+                        .content(objectMapper.writeValueAsString(BookingTestData.getBookinReqDto()))
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+
+    }
+
+    @Test
     void createBookingTest_when_not_found_404_error() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
@@ -97,7 +110,7 @@ class BookingControllerTest {
     void createBookingTest_when_500_error() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.createBooking(anyLong(), any(BookingRequestDto.class)))
-                .thenThrow(BookingException.class);
+                .thenThrow(new BookingException("Test error"));
 
         mockMvc.perform(post("/bookings")
                         .content(objectMapper.writeValueAsString(BookingTestData.getBookinReqDto()))
@@ -247,6 +260,22 @@ class BookingControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
+                .andDo(print());
+
+    }
+
+    @Test
+    void getBookingsForCurrentUserWhen_arg_error_500_error() throws Exception {
+        objectMapper.registerModule(new JavaTimeModule());
+
+        mockMvc.perform(get("/bookings")
+                        .param("from", "0")
+                        .param("size", "2")
+                        .param("state", "error")
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
                 .andDo(print());
 
     }

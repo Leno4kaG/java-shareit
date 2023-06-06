@@ -171,6 +171,19 @@ class ItemRequestControllerTest {
     }
 
     @Test
+    void getAllRequestsWhen_param_null_200_OK() throws Exception {
+
+        objectMapper.registerModule(new JavaTimeModule());
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
     void getAllRequestsWhen_404_OK() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.getAllRequests(anyLong(), any(), any()))

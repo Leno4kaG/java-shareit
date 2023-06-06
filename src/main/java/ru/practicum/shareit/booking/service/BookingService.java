@@ -15,10 +15,10 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
@@ -34,9 +34,9 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
 
-    private final UserRepositoryDB userRepositoryDB;
+    private final UserRepository userRepository;
 
-    private final ItemRepositoryDB itemRepositoryDB;
+    private final ItemRepository itemRepository;
 
     private final BookingMapper bookingMapper;
 
@@ -51,7 +51,7 @@ public class BookingService {
         final long itemId = bookingRequestDto.getItemId();
         User user = findUser(userId);
         log.info("User {}", user);
-        Item item = itemRepositoryDB.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
         if (userId == item.getOwner().getId()) {
             log.error("Owner is not booking item");
             throw new ItemNotFoundException(itemId);
@@ -117,7 +117,7 @@ public class BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state, Integer from, Integer size) {
         User owner = findUser(userId);
-        List<Item> itemList = itemRepositoryDB.findAllByOwnerId(owner.getId());
+        List<Item> itemList = itemRepository.findAllByOwnerId(owner.getId());
         List<Booking> bookings = getBookingsByItem(state, itemList);
         return pageParamValidation.getListWithPageParam(from, size, bookingMapper.toListDto(bookings));
     }
@@ -185,6 +185,6 @@ public class BookingService {
     }
 
     private User findUser(Long userId) {
-        return userRepositoryDB.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

@@ -24,6 +24,4 @@ public interface ItemMapper {
     ItemWithBooking toItemWithBooking(Item item);
 
     List<ItemDto> toListDto(List<Item> itemList);
-
-    List<Item> fromListDto(List<ItemDto> itemDtoList);
 }

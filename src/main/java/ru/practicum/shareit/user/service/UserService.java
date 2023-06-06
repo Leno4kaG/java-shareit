@@ -8,7 +8,7 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -17,23 +17,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepositoryDB userRepositoryDB;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.fromDto(userDto);
-        return userMapper.toDto(userRepositoryDB.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
     public UserDto getUserById(long id) {
-        return userMapper.toDto(userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
+        return userMapper.toDto(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
 
     @Transactional
     public UserDto updateUser(long id, UserDto userDto) {
-        User user = userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         String name = userDto.getName();
         String email = userDto.getEmail();
         if (name != null) {
@@ -42,18 +42,18 @@ public class UserService {
         if (email != null) {
             user.setEmail(email);
         }
-        return userMapper.toDto(userRepositoryDB.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Transactional
     public void deleteUserById(long id) {
-        userRepositoryDB.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        userRepositoryDB.deleteById(id);
+        userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        userRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
-        return userMapper.toDtoList(userRepositoryDB.findAll());
+        return userMapper.toDtoList(userRepository.findAll());
     }
 
 }

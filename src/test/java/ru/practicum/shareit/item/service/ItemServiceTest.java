@@ -19,10 +19,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.PageParamValidation;
 
 import java.util.List;
@@ -35,8 +35,8 @@ import static org.mockito.Mockito.when;
 
 class ItemServiceTest {
 
-    private ItemRepositoryDB itemRepository = mock(ItemRepositoryDB.class);
-    private UserRepositoryDB userRepository = mock(UserRepositoryDB.class);
+    private ItemRepository itemRepository = mock(ItemRepository.class);
+    private UserRepository userRepository = mock(UserRepository.class);
 
     private BookingRepository bookingRepository = mock(BookingRepository.class);
     private ItemMapper itemMapper = mock(ItemMapper.class);

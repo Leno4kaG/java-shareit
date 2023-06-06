@@ -8,10 +8,6 @@ public class ItemRequestNotFoundException extends RuntimeException {
         this.itemRequestId = itemRequestId;
     }
 
-    public ItemRequestNotFoundException(String message, Long itemRequestId) {
-        super(message);
-        this.itemRequestId = itemRequestId;
-    }
 
     public Long getItemRequestId() {
         return this.itemRequestId;

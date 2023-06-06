@@ -21,11 +21,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemService {
 
-    private final ItemRepositoryDB itemRepository;
-    private final UserRepositoryDB userRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;

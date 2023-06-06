@@ -16,11 +16,11 @@ import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepositoryDB;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryDB;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.util.PageParamValidation;
 
 import java.util.List;
@@ -38,9 +38,9 @@ class BookingServiceTest {
 
     private BookingRepository bookingRepository = mock(BookingRepository.class);
 
-    private UserRepositoryDB userRepositoryDB = mock(UserRepositoryDB.class);
+    private UserRepository userRepository = mock(UserRepository.class);
 
-    private ItemRepositoryDB itemRepositoryDB = mock(ItemRepositoryDB.class);
+    private ItemRepository itemRepository = mock(ItemRepository.class);
 
     private BookingMapper bookingMapper = mock(BookingMapperImpl.class);
 
@@ -51,8 +51,8 @@ class BookingServiceTest {
 
     private PageParamValidation<BookingDto> pageParamValidation = mock(PageParamValidation.class);
 
-    private final BookingService bookingService = new BookingService(bookingRepository, userRepositoryDB,
-            itemRepositoryDB, bookingMapper, userMapper, itemMapper, pageParamValidation);
+    private final BookingService bookingService = new BookingService(bookingRepository, userRepository,
+            itemRepository, bookingMapper, userMapper, itemMapper, pageParamValidation);
 
     @Test
     void createBookingWhenDataCorrect() {
@@ -60,11 +60,11 @@ class BookingServiceTest {
         BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(itemRepositoryDB.findById(bookingRequestDto.getItemId()))
+        when(itemRepository.findById(bookingRequestDto.getItemId()))
                 .thenReturn(Optional.of(ItemTestData.getItem()));
         when(bookingRepository.save(any())).thenReturn(BookingTestData.getBooking());
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
 
         when(bookingMapper.toBookingDto(any(BookingRequestDto.class))).thenReturn(bookingDto);
         when(userMapper.toDto(any(User.class))).thenReturn(bookingDto.getBooker());
@@ -81,16 +81,16 @@ class BookingServiceTest {
         BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         UserNotFoundException userError = assertThrows(UserNotFoundException.class,
                 () -> bookingService.createBooking(userId, bookingRequestDto));
         //when user not found
         assertEquals(userId, userError.getUserId());
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
 
-        when(itemRepositoryDB.findById(bookingRequestDto.getItemId()))
+        when(itemRepository.findById(bookingRequestDto.getItemId()))
                 .thenReturn(Optional.empty());
 
         ItemNotFoundException itemError = assertThrows(ItemNotFoundException.class,
@@ -98,7 +98,7 @@ class BookingServiceTest {
         //when item not found
         assertEquals(bookingRequestDto.getItemId(), itemError.getItemId());
         Item itemErrors = ItemTestData.getItemError();
-        when(itemRepositoryDB.findById(bookingRequestDto.getItemId()))
+        when(itemRepository.findById(bookingRequestDto.getItemId()))
                 .thenReturn(Optional.of(itemErrors));
         ItemNotFoundException itemErrorOwner = assertThrows(ItemNotFoundException.class,
                 () -> bookingService.createBooking(userId, bookingRequestDto));
@@ -120,7 +120,7 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findById(any())).thenReturn(Optional.of(booking));
         when(bookingRepository.save(booking))
                 .thenReturn(booking);
@@ -139,7 +139,7 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findById(any())).thenReturn(Optional.of(booking));
 
         BookingNotFoundException resultError = assertThrows(BookingNotFoundException.class,
@@ -161,7 +161,7 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findById(any())).thenReturn(Optional.of(booking));
         when(bookingMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -177,7 +177,7 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
 
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findById(any())).thenReturn(Optional.of(booking));
 
         BookingNotFoundException resultError = assertThrows(BookingNotFoundException.class,
@@ -195,8 +195,65 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForCurrentUserWhenDataCorrectPastState() {
+        Long userId = 2L;
+        BookingState state = BookingState.PAST;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(bookingRepository.findAllByBookerIdAndEndBefore(anyLong(), any(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForCurrentUserWhenDataCorrectFutureState() {
+        Long userId = 2L;
+        BookingState state = BookingState.FUTURE;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(bookingRepository.findAllByBookerIdAndStartAfter(anyLong(), any(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForCurrentUserWhenDataCorrectWaitingState() {
+        Long userId = 2L;
+        BookingState state = BookingState.WAITING;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(bookingRepository.findAllByBookerIdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
         when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
@@ -216,7 +273,7 @@ class BookingServiceTest {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
         when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenCallRealMethod();
@@ -243,9 +300,93 @@ class BookingServiceTest {
         List<Item> items = List.of(ItemTestData.getItem());
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
-        when(itemRepositoryDB.findAllByOwnerId(any())).thenReturn(items);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForAllItemsWhenDataCorrectCurrentState() {
+        Long userId = 2L;
+        BookingState state = BookingState.CURRENT;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        List<Item> items = List.of(ItemTestData.getItem());
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
+        when(bookingRepository.findAllCurrentByItem(any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForAllItemsWhenDataCorrectPastState() {
+        Long userId = 2L;
+        BookingState state = BookingState.PAST;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        List<Item> items = List.of(ItemTestData.getItem());
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
+        when(bookingRepository.findAllByItemIdAndEndBefore(any(), any(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForAllItemsWhenDataCorrectFutureState() {
+        Long userId = 2L;
+        BookingState state = BookingState.FUTURE;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        List<Item> items = List.of(ItemTestData.getItem());
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
+        when(bookingRepository.findAllByItemIdAndStartAfter(any(), any(), any())).thenReturn(List.of(booking));
+        when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
+        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
+
+        List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
+
+        assertEquals(bookingDtoList, resultList);
+    }
+
+    @Test
+    void getBookingsForAllItemsWhenDataCorrectWaitingState() {
+        Long userId = 2L;
+        BookingState state = BookingState.WAITING;
+        Integer from = 0;
+        Integer size = 1;
+        Booking booking = BookingTestData.getBooking();
+        List<Item> items = List.of(ItemTestData.getItem());
+        BookingDto bookingDto = BookingTestData.getBookingDto();
+        List<BookingDto> bookingDtoList = List.of(bookingDto);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
+        when(bookingRepository.findBookingByItemIdAndStatus(any(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
         when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
@@ -266,8 +407,8 @@ class BookingServiceTest {
         List<Item> items = List.of(ItemTestData.getItem());
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepositoryDB.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
-        when(itemRepositoryDB.findAllByOwnerId(any())).thenReturn(items);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
         when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenCallRealMethod();
