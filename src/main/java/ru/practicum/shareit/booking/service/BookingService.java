@@ -135,11 +135,8 @@ public class BookingService {
             return bookingRepository.findAllByBookerIdAndEndBefore(booker.getId(), date, sort);
         } else if (BookingState.FUTURE.equals(state)) {
             return bookingRepository.findAllByBookerIdAndStartAfter(booker.getId(), date, sort);
-        } else if (BookingState.WAITING.equals(state) || BookingState.REJECTED.equals(state)) {
-            return bookingRepository.findAllByBookerIdAndStatus(booker.getId(), BookingStatus.valueOf(state.name()), sort);
         } else {
-            log.info("Booking with state {} not found", state);
-            throw new BookingException(String.format("Unknown state: %s", state));
+            return bookingRepository.findAllByBookerIdAndStatus(booker.getId(), BookingStatus.valueOf(state.name()), sort);
         }
     }
 

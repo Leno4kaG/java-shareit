@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
@@ -74,6 +75,41 @@ public class BookingServiceIntegrationTest {
         bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(40));
         assertThrows(BookingValidationException.class,
                 () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+    }
+
+    @Test
+    void createBookingValidationErrorDate() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        bookingRequestDto.setStart(LocalDateTime.now().plusMinutes(2));
+        bookingRequestDto.setEnd(bookingRequestDto.getStart().minusMinutes(1));
+
+        assertThrows(BookingValidationException.class,
+                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+        bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(2));
+        bookingRequestDto.setEnd(LocalDateTime.now().plusMinutes(10));
+        assertThrows(BookingValidationException.class,
+                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+    }
+
+    @Test
+    void updateBookingTest() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        BookingDto bookingDto = bookingService.createBooking(userDto1.getId(), bookingRequestDto);
+        bookingDto.setEnd(LocalDateTime.now().plusMinutes(20));
+
+        BookingDto bookingDto1 = bookingService.updateBooking(userDto.getId(), bookingDto.getId(), false);
+
+        assertEquals(BookingStatus.REJECTED, bookingDto1.getStatus());
     }
 
     @Test

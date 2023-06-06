@@ -216,6 +216,26 @@ class ItemServiceTest {
     }
 
     @Test
+    void getItemWhenIsNotFound2() {
+        long userId = 2L;
+        Item item = ItemTestData.getItem();
+        ItemWithBooking itemWithBooking = ItemTestData.getItemWithBooking();
+        List<Comment> comments = List.of(ItemTestData.getComment());
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(item.getOwner()));
+        when(itemRepository.findById(any())).thenThrow(new ItemNotFoundException(itemWithBooking.getId()));
+        when(bookingRepository.findBookingByItemIn(any(), any())).thenReturn(List.of(BookingTestData.getBooking()));
+        when(commentRepository.findAllByItemIn(any())).thenReturn(comments);
+        when(itemMapper.toItemWithBooking(any())).thenReturn(itemWithBooking);
+        when(commentMapper.toListDto(any())).thenReturn(itemWithBooking.getComments());
+
+        ItemNotFoundException result = assertThrows(ItemNotFoundException.class,
+                () -> itemService.getItem(itemWithBooking.getId(), userId));
+
+        assertEquals(itemWithBooking.getId(), result.getItemId());
+    }
+
+    @Test
     void getAllItemsWhenDataCorrect() {
         long userId = 2L;
         Integer from = 0;

@@ -194,9 +194,6 @@ public class ItemService {
     private ItemWithBooking getItemWithBooking(Item item, Long userId) {
         List<CommentDto> comments = commentMapper.toListDto(commentRepository.findAllByItem(item));
         List<ItemWithBooking> bookings = getItemsWithBooking(List.of(item), userId);
-        if (bookings.isEmpty()) {
-            throw new ItemNotFoundException(item.getId());
-        }
         ItemWithBooking itemWithBooking = bookings.get(0);
         itemWithBooking.setComments(comments);
         return itemWithBooking;
