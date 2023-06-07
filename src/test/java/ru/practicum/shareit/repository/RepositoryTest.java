@@ -3,7 +3,6 @@ package ru.practicum.shareit.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -27,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 class RepositoryTest {
 
-    @Autowired
-    TestEntityManager em;
     @Autowired
     BookingRepository bookingRepository;
     @Autowired

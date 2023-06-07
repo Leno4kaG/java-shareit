@@ -280,6 +280,20 @@ class ItemControllerTest {
     }
 
     @Test
+    void searchItemsWhenTextNull_200_OK() throws Exception {
+
+        mockMvc.perform(get("/items/search")
+                        .param("from", "0")
+                        .param("size", "2")
+                        .param("text", "")
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
     void searchItemsWhen_404_OK() throws Exception {
         when(itemService.searchItems(anyString(), anyLong(), any(), any()))
                 .thenThrow(ItemNotFoundException.class);

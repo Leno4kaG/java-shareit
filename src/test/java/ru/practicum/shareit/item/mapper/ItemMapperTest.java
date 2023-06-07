@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ItemMapperTest {
 
@@ -25,6 +26,14 @@ class ItemMapperTest {
     }
 
     @Test
+    void toDtoWhenNull() {
+
+        ItemDto result = itemMapper.toDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void fromDto() {
         Item item = ItemTestData.getItem();
         ItemDto itemDto = ItemTestData.getItemDto();
@@ -34,6 +43,14 @@ class ItemMapperTest {
         Item result = itemMapper.fromDto(itemDto);
 
         assertEquals(item, result);
+    }
+
+    @Test
+    void fromDtoWhenNull() {
+
+        Item result = itemMapper.fromDto(null);
+
+        assertNull(result);
     }
 
     @Test
@@ -49,6 +66,14 @@ class ItemMapperTest {
     }
 
     @Test
+    void toItemWithBookingWhenNull() {
+
+        ItemWithBooking result = itemMapper.toItemWithBooking(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toListDto() {
         Item item = ItemTestData.getItem();
         ItemDto itemDto = ItemTestData.getItemDto();
@@ -56,5 +81,12 @@ class ItemMapperTest {
         List<ItemDto> list = itemMapper.toListDto(List.of(item));
 
         assertEquals(List.of(itemDto), list);
+    }
+
+    @Test
+    void toListDtoWhenNull() {
+        List<ItemDto> list = itemMapper.toListDto(null);
+
+        assertNull(list);
     }
 }

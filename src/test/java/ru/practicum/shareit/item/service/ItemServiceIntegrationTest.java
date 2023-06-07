@@ -12,6 +12,7 @@ import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.CommentValidationException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.PageParamException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -40,6 +42,21 @@ public class ItemServiceIntegrationTest {
     @Autowired
     private ItemService itemService;
 
+    @Test
+    void getItemTest() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+
+        ItemWithBooking result = itemService.getItem(item.getId(), userDto.getId());
+
+        assertEquals(item.getName(), result.getName());
+        assertEquals(item.getId(), result.getId());
+
+        assertThrows(ItemNotFoundException.class, () -> itemService.getItem(12L, userDto.getId()));
+    }
 
     @Test
     void getAllItemsTest() {
@@ -65,6 +82,23 @@ public class ItemServiceIntegrationTest {
                 () -> itemService.getAllItems(userDto.getId(), -100, null));
         assertThrows(PageParamException.class,
                 () -> itemService.getAllItems(userDto.getId(), 0, 0));
+    }
+
+    @Test
+    void searchItemsTest() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+
+        List<ItemDto> result = itemService.searchItems("test", userDto.getId(), 0, 1);
+
+        assertEquals(List.of(item), result);
+
+        List<ItemDto> listEmpty = itemService.searchItems("щетка", userDto.getId(), 0, 1);
+
+        assertEquals(0, listEmpty.size());
     }
 
     @Test

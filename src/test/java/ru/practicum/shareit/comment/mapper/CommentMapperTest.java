@@ -8,6 +8,7 @@ import ru.practicum.shareit.data.ItemTestData;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CommentMapperTest {
 
@@ -27,6 +28,14 @@ class CommentMapperTest {
     }
 
     @Test
+    void fromDtoWhenNull() {
+
+        Comment result = commentMapper.fromDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toDto() {
         CommentDto commentDto = ItemTestData.getCommentDto();
         Comment comment = ItemTestData.getComment();
@@ -39,6 +48,14 @@ class CommentMapperTest {
     }
 
     @Test
+    void toDtoWhenNull() {
+
+        CommentDto result = commentMapper.toDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toListDto() {
         CommentDto commentDto = ItemTestData.getCommentDto();
         Comment comment = ItemTestData.getComment();
@@ -48,5 +65,27 @@ class CommentMapperTest {
         List<CommentDto> list = commentMapper.toListDto(List.of(comment));
 
         assertEquals(List.of(commentDto), list);
+    }
+
+    @Test
+    void toListDtoWhenAuthorNull() {
+        CommentDto commentDto = ItemTestData.getCommentDto();
+        Comment comment = ItemTestData.getComment();
+        comment.setAuthor(null);
+        commentDto.setAuthorName(null);
+        commentDto.setCreated(comment.getCreated());
+
+        List<CommentDto> list = commentMapper.toListDto(List.of(comment));
+
+        assertEquals(List.of(commentDto), list);
+        assertNull(list.get(0).getAuthorName());
+    }
+
+    @Test
+    void toListDtoWhenNull() {
+
+        List<CommentDto> list = commentMapper.toListDto(null);
+
+        assertNull(list);
     }
 }

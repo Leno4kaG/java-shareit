@@ -128,4 +128,34 @@ public class BookingServiceIntegrationTest {
         assertThrows(PageParamException.class,
                 () -> bookingService.getBookingsForCurrentUser(userDto1.getId(), BookingState.CURRENT, 0, 0));
     }
+
+    @Test
+    void getBookingsForAllItems() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        BookingDto bookingDto = bookingService.createBooking(userDto1.getId(), bookingRequestDto);
+
+        List<BookingDto> result = bookingService.getBookingsForAllItems(userDto.getId(),
+                BookingState.ALL, 0, 1);
+        assertEquals(List.of(bookingDto), result);
+    }
+
+    @Test
+    void getBooking() {
+        UserDto userDto = userService.createUser(UserTestData.getUserDto());
+        UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
+        itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
+        ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
+        BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
+        bookingRequestDto.setItemId(item.getId());
+        BookingDto bookingDto = bookingService.createBooking(userDto1.getId(), bookingRequestDto);
+
+        BookingDto result = bookingService.getBooking(userDto1.getId(), bookingDto.getId());
+
+        assertEquals(bookingDto, result);
+    }
 }

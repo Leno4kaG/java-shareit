@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BookingMapperTest {
 
@@ -44,6 +45,14 @@ class BookingMapperTest {
     }
 
     @Test
+    void toBookingDtoWhenNull() {
+
+        BookingDto result = bookingMapper.toBookingDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toDto() {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
@@ -57,6 +66,14 @@ class BookingMapperTest {
     }
 
     @Test
+    void toDtoWhenNull() {
+
+        BookingDto result = bookingMapper.toDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toBookingForItem() {
         Booking booking = BookingTestData.getBooking();
         BookingForItem bookingForItem = BookingTestData.getBookinForItem();
@@ -64,6 +81,14 @@ class BookingMapperTest {
         BookingForItem result = bookingMapper.toBookingForItem(booking);
 
         assertEquals(bookingForItem, result);
+    }
+
+    @Test
+    void toBookingForItemWhenNull() {
+
+        BookingForItem result = bookingMapper.toBookingForItem(null);
+
+        assertNull(result);
     }
 
     @Test
@@ -84,6 +109,13 @@ class BookingMapperTest {
     }
 
     @Test
+    void fromDtoWhenNull() {
+        Booking result = bookingMapper.fromDto(null);
+
+        assertNull(result);
+    }
+
+    @Test
     void toListDto() {
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
@@ -94,5 +126,13 @@ class BookingMapperTest {
         List<BookingDto> bookingDtoList = bookingMapper.toListDto(List.of(booking));
 
         assertEquals(List.of(bookingDto), bookingDtoList);
+    }
+
+    @Test
+    void toListDtoWhenNull() {
+
+        List<BookingDto> bookingDtoList = bookingMapper.toListDto(null);
+
+        assertNull(bookingDtoList);
     }
 }
