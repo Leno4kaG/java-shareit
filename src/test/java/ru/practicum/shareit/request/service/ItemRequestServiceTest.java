@@ -10,11 +10,11 @@ import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.item.dto.ItemWithBooking;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestInfoDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -38,22 +38,22 @@ class ItemRequestServiceTest {
 
     private ItemRepository itemRepository = mock(ItemRepository.class);
 
-    private ItemService itemService = mock(ItemService.class);
+    private ItemMapper itemMapper = mock(ItemMapper.class);
 
     private ItemRequestService itemRequestService = new ItemRequestService(requestRepository, userRepository,
-            requestMapper, itemRepository, itemService);
+            requestMapper, itemRepository, itemMapper);
 
     @Test
     void createRequestWhenDataCorrect() {
         User user = UserTestData.getUser();
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestMapper.fromDto(any())).thenReturn(itemRequest);
-        when(requestMapper.toDto(any())).thenReturn(itemRequestDto);
+        when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
 
-        ItemRequestDto result = itemRequestService.createRequest(user.getId(), itemRequestDto);
+        RequestInfoDto result = itemRequestService.createRequest(user.getId(), ItemRequestTestData.getItemReqDto());
 
         assertEquals(itemRequestDto, result);
     }
@@ -75,17 +75,17 @@ class ItemRequestServiceTest {
     void getAllRequestsForOwnerTest() {
         User user = UserTestData.getUser();
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
         List<Item> items = List.of(ItemTestData.getItem());
-        List<ItemWithBooking> itemsWithBooking = List.of(ItemTestData.getItemWithBooking());
+
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestRepository.findAllByRequestId(anyLong(), any())).thenReturn(List.of(itemRequest));
-        when(requestMapper.toListDto(any())).thenReturn(List.of(itemRequestDto));
+        when(requestMapper.toListInfoDto(any())).thenReturn(List.of(itemRequestDto));
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
-        when(itemService.getItemsWithBooking(any(), anyLong())).thenReturn(itemsWithBooking);
+        when(itemMapper.toListDto(any())).thenReturn(List.of(ItemTestData.getItemDto()));
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequestsForOwner(user.getId());
+        List<RequestInfoDto> result = itemRequestService.getAllRequestsForOwner(user.getId());
 
         assertEquals(itemRequestDto, result.get(0));
     }
@@ -108,20 +108,20 @@ class ItemRequestServiceTest {
         Integer from = 0;
         Integer size = 1;
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
         List<Item> items = List.of(ItemTestData.getItem());
-        List<ItemWithBooking> itemsWithBooking = List.of(ItemTestData.getItemWithBooking());
+
         Pageable pageable = PageRequest.of(0, 1);
         Page<ItemRequest> page = new PageImpl<>(List.of(itemRequest).subList(0, 1), pageable, 1);
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestRepository.findAll(any(Pageable.class))).thenReturn(page);
-        when(requestMapper.toDto(any())).thenReturn(itemRequestDto);
-        when(requestMapper.toListDto(any())).thenReturn(List.of(itemRequestDto));
+        when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
+        when(requestMapper.toListInfoDto(any())).thenReturn(List.of(itemRequestDto));
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
-        when(itemService.getItemsWithBooking(any(), anyLong())).thenReturn(itemsWithBooking);
+        when(itemMapper.toListDto(any())).thenReturn(List.of(ItemTestData.getItemDto()));
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequests(user.getId(), from, size);
+        List<RequestInfoDto> result = itemRequestService.getAllRequests(user.getId(), from, size);
 
         assertEquals(itemRequestDto, result.get(0));
     }
@@ -132,20 +132,16 @@ class ItemRequestServiceTest {
         Integer from = 0;
         Integer size = 1;
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
         List<Item> items = List.of(ItemTestData.getItem());
-        List<ItemWithBooking> itemsWithBooking = List.of(ItemTestData.getItemWithBooking());
-        Pageable pageable = PageRequest.of(0, 1);
-        Page<ItemRequest> page = new PageImpl<>(List.of(itemRequest).subList(0, 1), pageable, 1);
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(requestRepository.findAll(any(Pageable.class))).thenReturn(page);
-        when(requestMapper.toDto(any())).thenReturn(itemRequestDto);
-        when(requestMapper.toListDto(any())).thenReturn(List.of(itemRequestDto));
+        when(requestRepository.findAll(any(Pageable.class))).thenReturn(null);
+        when(requestMapper.toInfoDto(any())).thenReturn(null);
+        when(requestMapper.toListInfoDto(any())).thenReturn(List.of());
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
-        when(itemService.getItemsWithBooking(any(), anyLong())).thenReturn(itemsWithBooking);
+        when(itemMapper.toListDto(any())).thenReturn(List.of(ItemTestData.getItemDto()));
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequests(user.getId(), from, size);
+        List<RequestInfoDto> result = itemRequestService.getAllRequests(user.getId(), from, size);
 
         assertTrue(result.isEmpty());
     }
@@ -154,13 +150,13 @@ class ItemRequestServiceTest {
     void getItemRequestByIdWhenRequestFound() {
         User user = UserTestData.getOwner();
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
-        when(requestMapper.toDto(any())).thenReturn(itemRequestDto);
+        when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
 
-        ItemRequestDto result = itemRequestService.getItemRequestById(user.getId(), itemRequest.getId());
+        RequestInfoDto result = itemRequestService.getItemRequestById(user.getId(), itemRequest.getId());
 
         assertEquals(itemRequestDto, result);
     }

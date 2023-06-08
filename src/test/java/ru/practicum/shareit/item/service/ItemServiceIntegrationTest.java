@@ -13,7 +13,6 @@ import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.CommentValidationException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.PageParamException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -66,22 +65,16 @@ public class ItemServiceIntegrationTest {
 
         ItemDto item = itemService.createItem(ItemTestData.getItemDto(), userDto.getId());
 
-        List<ItemWithBooking> items = itemService.getAllItems(userDto.getId(), null, null);
+        List<ItemWithBooking> items = itemService.getAllItems(userDto.getId(), 0, 10);
         assertThat(items.get(0).getId(), equalTo(item.getId()));
         UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
 
-        List<ItemWithBooking> items1 = itemService.getAllItems(userDto.getId(), null, 1);
+        List<ItemWithBooking> items1 = itemService.getAllItems(userDto.getId(), 0, 1);
         assertThat(items1.size(), equalTo(1));
         ItemDto item1 = itemService.createItem(ItemTestData.getItemDto(), userDto1.getId());
         itemRequestService.createRequest(userDto1.getId(), ItemRequestTestData.getItemReqDto());
-        List<ItemWithBooking> items2 = itemService.getAllItems(userDto.getId(), null, 1);
+        List<ItemWithBooking> items2 = itemService.getAllItems(userDto.getId(), 0, 1);
         assertThat(items2.size(), equalTo(0));
-        assertThrows(PageParamException.class,
-                () -> itemService.getAllItems(userDto.getId(), 0, 0));
-        assertThrows(PageParamException.class,
-                () -> itemService.getAllItems(userDto.getId(), -100, null));
-        assertThrows(PageParamException.class,
-                () -> itemService.getAllItems(userDto.getId(), 0, 0));
     }
 
     @Test

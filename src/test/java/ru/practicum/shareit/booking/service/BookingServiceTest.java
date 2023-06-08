@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -12,7 +13,10 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.BookingValidationException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
@@ -21,7 +25,6 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.util.PageParamValidation;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,10 +52,8 @@ class BookingServiceTest {
     private ItemMapper itemMapper = mock(ItemMapperImpl.class);
 
 
-    private PageParamValidation<BookingDto> pageParamValidation = mock(PageParamValidation.class);
-
     private final BookingService bookingService = new BookingService(bookingRepository, userRepository,
-            itemRepository, bookingMapper, userMapper, itemMapper, pageParamValidation);
+            itemRepository, bookingMapper, userMapper, itemMapper);
 
     @Test
     void createBookingWhenDataCorrect() {
@@ -198,7 +199,6 @@ class BookingServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
 
@@ -217,7 +217,6 @@ class BookingServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerIdAndEndBefore(anyLong(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
 
@@ -236,7 +235,6 @@ class BookingServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerIdAndStartAfter(anyLong(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
 
@@ -255,7 +253,6 @@ class BookingServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(bookingRepository.findAllByBookerIdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForCurrentUser(userId, state, from, size);
 
@@ -266,28 +263,19 @@ class BookingServiceTest {
     void getBookingsForCurrentUserWhenDataError() {
         Long userId = 2L;
         BookingState state = BookingState.ALL;
-        Integer from = -1;
+        Integer from = 0;
         Integer size = 1;
-        String errorMessage = "Индекс 1 страницы меньше 0";
-        String errorMessage1 = "Количество страниц не должно быть = 0 или быть меньше 0";
         Booking booking = BookingTestData.getBooking();
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenThrow(new UserNotFoundException(userId));
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenCallRealMethod();
 
-        PageParamException resultError = assertThrows(PageParamException.class,
+        UserNotFoundException resultError = assertThrows(UserNotFoundException.class,
                 () -> bookingService.getBookingsForCurrentUser(userId, state, from, size));
 
-        assertEquals(errorMessage, resultError.getMessage());
-        Integer from1 = 0;
-        Integer size1 = 0;
-        PageParamException resultError1 = assertThrows(PageParamException.class,
-                () -> bookingService.getBookingsForCurrentUser(userId, state, from1, size1));
-
-        assertEquals(errorMessage1, resultError1.getMessage());
+        assertEquals(userId, resultError.getUserId());
     }
 
     @Test
@@ -302,9 +290,8 @@ class BookingServiceTest {
         List<BookingDto> bookingDtoList = List.of(bookingDto);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
-        when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemId(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
 
@@ -323,9 +310,8 @@ class BookingServiceTest {
         List<BookingDto> bookingDtoList = List.of(bookingDto);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
-        when(bookingRepository.findAllCurrentByItem(any())).thenReturn(List.of(booking));
+        when(bookingRepository.findAllCurrentByItem(any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
 
@@ -346,7 +332,6 @@ class BookingServiceTest {
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findAllByItemIdAndEndBefore(any(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
 
@@ -367,7 +352,6 @@ class BookingServiceTest {
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findAllByItemIdAndStartAfter(any(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
 
@@ -388,7 +372,6 @@ class BookingServiceTest {
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findBookingByItemIdAndStatus(any(), any(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenReturn(bookingDtoList);
 
         List<BookingDto> resultList = bookingService.getBookingsForAllItems(userId, state, from, size);
 
@@ -399,29 +382,20 @@ class BookingServiceTest {
     void getBookingsForAllItemsWhenDataError() {
         Long userId = 2L;
         BookingState state = BookingState.ALL;
-        Integer from = -1;
+        Integer from = 0;
         Integer size = 1;
-        String errorMessage = "Индекс 1 страницы меньше 0";
-        String errorMessage1 = "Количество страниц не должно быть = 0 или быть меньше 0";
         Booking booking = BookingTestData.getBooking();
         List<Item> items = List.of(ItemTestData.getItem());
         BookingDto bookingDto = BookingTestData.getBookingDto();
         List<BookingDto> bookingDtoList = List.of(bookingDto);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
+        when(userRepository.findById(anyLong())).thenThrow(new UserNotFoundException(userId));
         when(itemRepository.findAllByOwnerId(any())).thenReturn(items);
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
         when(bookingMapper.toListDto(List.of(booking))).thenReturn(bookingDtoList);
-        when(pageParamValidation.getListWithPageParam(any(), any(), any())).thenCallRealMethod();
 
-        PageParamException resultError = assertThrows(PageParamException.class,
+        UserNotFoundException resultError = assertThrows(UserNotFoundException.class,
                 () -> bookingService.getBookingsForAllItems(userId, state, from, size));
 
-        assertEquals(errorMessage, resultError.getMessage());
-        Integer from1 = 0;
-        Integer size1 = 0;
-        PageParamException resultError1 = assertThrows(PageParamException.class,
-                () -> bookingService.getBookingsForAllItems(userId, state, from1, size1));
-
-        assertEquals(errorMessage1, resultError1.getMessage());
+        assertEquals(userId, resultError.getUserId());
     }
 }

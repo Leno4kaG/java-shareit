@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +28,9 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,9 +52,6 @@ public class ItemService {
 
     private final ItemRequestRepository itemRequestRepository;
 
-    private final PageParamValidation<ItemWithBooking> pageParamValidation;
-
-    private final PageParamValidation<ItemDto> pageParamValid;
 
     @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
@@ -91,14 +88,16 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemWithBooking> getAllItems(long userId, Integer from, Integer size) {
-        List<Item> items = itemRepository.findAllByOwnerId(userId).stream()
-                .sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
-        return pageParamValidation.getListWithPageParam(from, size, getItemsWithBooking(items, userId));
+        Sort sort = Sort.by("id").ascending();
+        Pageable pageable = PageRequest.of(from, size, sort);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, pageable);
+        return getItemsWithBooking(items, userId);
     }
 
     @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String text, long userId, Integer from, Integer size) {
-        return pageParamValid.getListWithPageParam(from, size, itemMapper.toListDto(itemRepository.searchItems(text)));
+        Pageable pageable = PageRequest.of(from, size);
+        return itemMapper.toListDto(itemRepository.searchItems(text, pageable));
     }
 
     @Transactional

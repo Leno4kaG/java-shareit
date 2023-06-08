@@ -15,7 +15,6 @@ import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.BookingValidationException;
-import ru.practicum.shareit.exception.PageParamException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -121,12 +120,8 @@ public class BookingServiceIntegrationTest {
         BookingRequestDto bookingRequestDto = BookingTestData.getBookinReqDto();
         bookingRequestDto.setItemId(item.getId());
         BookingDto bookingDto = bookingService.createBooking(userDto1.getId(), bookingRequestDto);
-        List<BookingDto> result = bookingService.getBookingsForCurrentUser(userDto1.getId(), BookingState.ALL, null, null);
+        List<BookingDto> result = bookingService.getBookingsForCurrentUser(userDto1.getId(), BookingState.ALL, 0, 10);
         assertThat(result.get(0).getId(), equalTo(bookingDto.getId()));
-        assertThrows(PageParamException.class,
-                () -> bookingService.getBookingsForCurrentUser(userDto1.getId(), BookingState.CURRENT, -100, null));
-        assertThrows(PageParamException.class,
-                () -> bookingService.getBookingsForCurrentUser(userDto1.getId(), BookingState.CURRENT, 0, 0));
     }
 
     @Test

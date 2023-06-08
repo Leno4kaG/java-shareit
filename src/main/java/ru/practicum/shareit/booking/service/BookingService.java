@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,20 +14,20 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.BookingValidationException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.util.PageParamValidation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +46,6 @@ public class BookingService {
 
     private final ItemMapper itemMapper;
 
-    private final PageParamValidation<BookingDto> pageParamValidation;
 
     @Transactional
     public BookingDto createBooking(Long userId, BookingRequestDto bookingRequestDto) {
@@ -111,56 +112,61 @@ public class BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForCurrentUser(Long userId, BookingState state, Integer from, Integer size) {
         User user = findUser(userId);
-        return pageParamValidation.getListWithPageParam(from, size, bookingMapper.toListDto(getBookings(state, user)));
+        return bookingMapper.toListDto(getBookings(state, user, from, size));
     }
 
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state, Integer from, Integer size) {
         User owner = findUser(userId);
         List<Item> itemList = itemRepository.findAllByOwnerId(owner.getId());
-        List<Booking> bookings = getBookingsByItem(state, itemList);
-        return pageParamValidation.getListWithPageParam(from, size, bookingMapper.toListDto(bookings));
+        List<Booking> bookings = getBookingsByItem(state, itemList, from, size);
+        return bookingMapper.toListDto(bookings);
     }
 
 
-    private List<Booking> getBookings(BookingState state, User booker) {
+    private List<Booking> getBookings(BookingState state, User booker, Integer from, Integer size) {
         Sort sort = Sort.by("start").descending();
+        Pageable sortedByStart = PageRequest.of(from, size, sort);
         LocalDateTime date = LocalDateTime.now();
         if (BookingState.ALL.equals(state)) {
-            return bookingRepository.findAllByBookerId(booker.getId(), sort);
+            if (from > size) from = size;
+            Pageable sortedByStartAll = PageRequest.of(from, size, sort);
+            return bookingRepository.findAllByBookerId(booker.getId(), sortedByStartAll);
         } else if (BookingState.CURRENT.equals(state)) {
-            return bookingRepository.findAllCurrent(booker).stream()
-                    .sorted(Comparator.comparing(Booking::getId)).collect(Collectors.toList());
+            Sort sortId = Sort.by("id").ascending();
+            Pageable sortedById = PageRequest.of(from, size, sortId);
+            return bookingRepository.findAllCurrent(booker.getId(), sortedById);
         } else if (BookingState.PAST.equals(state)) {
-            return bookingRepository.findAllByBookerIdAndEndBefore(booker.getId(), date, sort);
+            return bookingRepository.findAllByBookerIdAndEndBefore(booker.getId(), date, sortedByStart);
         } else if (BookingState.FUTURE.equals(state)) {
-            return bookingRepository.findAllByBookerIdAndStartAfter(booker.getId(), date, sort);
+            return bookingRepository.findAllByBookerIdAndStartAfter(booker.getId(), date, sortedByStart);
         } else {
-            return bookingRepository.findAllByBookerIdAndStatus(booker.getId(), BookingStatus.valueOf(state.name()), sort);
+            return bookingRepository.findAllByBookerIdAndStatus(booker.getId(), BookingStatus.valueOf(state.name()), sortedByStart);
         }
     }
 
-    private List<Booking> getBookingsByItem(BookingState state, List<Item> items) {
+    private List<Booking> getBookingsByItem(BookingState state, List<Item> items, Integer from, Integer size) {
         List<Booking> bookings = new ArrayList<>();
         Sort sort = Sort.by("start").descending();
+        Pageable sortedByStart = PageRequest.of(from, size, sort);
         LocalDateTime date = LocalDateTime.now();
         for (Item item : items) {
             if (BookingState.ALL.equals(state)) {
-                bookings.addAll(bookingRepository.findAllByItemId(item.getId(), sort));
+                bookings.addAll(bookingRepository.findAllByItemId(item.getId(), sortedByStart));
             }
             if (BookingState.CURRENT.equals(state)) {
-                bookings.addAll(bookingRepository.findAllCurrentByItem(item));
+                bookings.addAll(bookingRepository.findAllCurrentByItem(item, sortedByStart));
             }
             if (BookingState.PAST.equals(state)) {
-                bookings.addAll(bookingRepository.findAllByItemIdAndEndBefore(item.getId(), date, sort));
+                bookings.addAll(bookingRepository.findAllByItemIdAndEndBefore(item.getId(), date, sortedByStart));
             }
             if (BookingState.FUTURE.equals(state)) {
-                bookings.addAll(bookingRepository.findAllByItemIdAndStartAfter(item.getId(), date, sort));
+                bookings.addAll(bookingRepository.findAllByItemIdAndStartAfter(item.getId(), date, sortedByStart));
             }
             if (BookingState.WAITING.equals(state) || BookingState.REJECTED.equals(state)) {
 
                 bookings.addAll(bookingRepository.findBookingByItemIdAndStatus(item.getId(),
-                        BookingStatus.valueOf(state.name()), sort));
+                        BookingStatus.valueOf(state.name()), sortedByStart));
             }
         }
         return bookings;

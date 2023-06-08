@@ -18,6 +18,7 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestInfoDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -45,7 +46,7 @@ class ItemRequestServiceIntegrationTest {
     @Test
     void createRequestTest() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
-        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         assertEquals(itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId()), itemRequestDto);
 
@@ -57,7 +58,7 @@ class ItemRequestServiceIntegrationTest {
     void getItemRequestByIdTest() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto booker = userService.createUser(UserTestData.getUserDtoOwner());
-        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         ItemDto itemDto = ItemTestData.getItemDto();
         itemDto.setRequestId(itemRequestDto.getId());
@@ -66,7 +67,7 @@ class ItemRequestServiceIntegrationTest {
         bookingDtoReq.setItemId(itemDto1.getId());
         BookingDto bookingDto = bookingService.createBooking(booker.getId(), bookingDtoReq);
 
-        ItemRequestDto result = itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId());
+        RequestInfoDto result = itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId());
         assertEquals(itemRequestDto.getId(), result.getId());
         assertEquals(itemRequestDto.getDescription(), result.getDescription());
 
@@ -80,7 +81,7 @@ class ItemRequestServiceIntegrationTest {
     void getAllRequestsForOwner() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto booker = userService.createUser(UserTestData.getUserDtoOwner());
-        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         ItemDto itemDto = ItemTestData.getItemDto();
         itemDto.setRequestId(itemRequestDto.getId());
@@ -89,7 +90,7 @@ class ItemRequestServiceIntegrationTest {
         bookingDtoReq.setItemId(itemDto1.getId());
         BookingDto bookingDto = bookingService.createBooking(booker.getId(), bookingDtoReq);
 
-        List<ItemRequestDto> list = itemRequestService.getAllRequestsForOwner(user.getId());
+        List<RequestInfoDto> list = itemRequestService.getAllRequestsForOwner(user.getId());
 
         assertEquals(itemRequestDto.getId(), list.get(0).getId());
         assertEquals(itemRequestDto.getDescription(), list.get(0).getDescription());
@@ -99,10 +100,10 @@ class ItemRequestServiceIntegrationTest {
     void getAllRequests() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto user1 = userService.createUser(UserTestData.getUserDtoOwner());
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
-        itemRequestDto.setRequestorId(user1.getId());
-        itemRequestDto = itemRequestService.createRequest(user.getId(), itemRequestDto);
-        List<ItemRequestDto> list = itemRequestService.getAllRequests(user1.getId(), 0, 1);
+        ItemRequestDto reqDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(), reqDto);
+
+        List<RequestInfoDto> list = itemRequestService.getAllRequests(user1.getId(), 0, 1);
 
         assertEquals(List.of(itemRequestDto), list);
     }
@@ -110,9 +111,9 @@ class ItemRequestServiceIntegrationTest {
     @Test
     void getItemRequestById() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
-        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
-        ItemRequestDto result = itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId());
+        RequestInfoDto result = itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId());
 
         assertEquals(itemRequestDto, result);
     }

@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -11,6 +10,8 @@ import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,15 +46,15 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemWithBooking> getAllItems(@Validated @RequestParam(name = "from", required = false) Integer from,
-                                             @Validated @RequestParam(name = "size", required = false) Integer size,
+    public List<ItemWithBooking> getAllItems(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
                                              @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAllItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@Validated @RequestParam(name = "from", required = false) Integer from,
-                                     @Validated @RequestParam(name = "size", required = false) Integer size,
+    public List<ItemDto> searchItems(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
                                      @RequestParam(name = "text") String text,
                                      @RequestHeader("X-Sharer-User-Id") long userId) {
         if (text == null || text.isBlank()) {

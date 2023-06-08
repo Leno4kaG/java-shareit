@@ -16,6 +16,7 @@ import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestInfoDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.nio.charset.StandardCharsets;
@@ -55,32 +56,33 @@ class ItemRequestControllerTest {
 
     @Test
     void createRequestWhen_200_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
+        ItemRequestDto body = ItemRequestTestData.getItemReqDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenReturn(itemRequestDto);
 
         mockMvc.perform(post("/requests")
-                        .content(objectMapper.writeValueAsString(itemRequestDto))
+                        .content(objectMapper.writeValueAsString(body))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andDo(print())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
-                .andExpect(jsonPath("$.requestorId", is(itemRequestDto.getRequestorId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())));
     }
 
     @Test
     void createRequestWhen_404_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+
+        ItemRequestDto body = ItemRequestTestData.getItemReqDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenThrow(ItemNotFoundException.class);
 
         mockMvc.perform(post("/requests")
-                        .content(objectMapper.writeValueAsString(itemRequestDto))
+                        .content(objectMapper.writeValueAsString(body))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -90,13 +92,13 @@ class ItemRequestControllerTest {
 
     @Test
     void createRequestWhen_500_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        ItemRequestDto body = ItemRequestTestData.getItemReqDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
                 .thenThrow(RuntimeException.class);
 
         mockMvc.perform(post("/requests")
-                        .content(objectMapper.writeValueAsString(itemRequestDto))
+                        .content(objectMapper.writeValueAsString(body))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -106,7 +108,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllRequestsForOwnerWhen_200_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.getAllRequestsForOwner(anyLong()))
                 .thenReturn(List.of(itemRequestDto));
@@ -118,7 +120,6 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.[0].id", is(itemRequestDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].requestorId", is(itemRequestDto.getRequestorId()), Long.class))
                 .andExpect(jsonPath("$.[0].description", is(itemRequestDto.getDescription())));
     }
 
@@ -152,7 +153,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllRequestsWhen_200_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.getAllRequests(anyLong(), any(), any()))
                 .thenReturn(List.of(itemRequestDto));
@@ -166,7 +167,6 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.[0].id", is(itemRequestDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].requestorId", is(itemRequestDto.getRequestorId()), Long.class))
                 .andExpect(jsonPath("$.[0].description", is(itemRequestDto.getDescription())));
     }
 
@@ -217,7 +217,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getRequestByIdWhen_200_OK() throws Exception {
-        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
+        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.getItemRequestById(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
@@ -229,7 +229,6 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
-                .andExpect(jsonPath("$.requestorId", is(itemRequestDto.getRequestorId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())));
     }
 
