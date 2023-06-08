@@ -57,12 +57,6 @@ public class ErrorHandler {
         return new ErrorDto("Ошибка валидации");
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDto handleMethodArgumentNotValidException(PageParamException e) {
-        log.error(e.getMessage());
-        return new ErrorDto("Ошибка валидации параметров страницы");
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

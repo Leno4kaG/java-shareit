@@ -284,7 +284,7 @@ class BookingControllerTest {
     void getBookingsForCurrentUserWhen_400_error() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForCurrentUser(anyLong(), any(BookingState.class), any(), any()))
-                .thenThrow(PageParamException.class);
+                .thenThrow(BookingValidationException.class);
         mockMvc.perform(get("/bookings")
                         .param("from", "0")
                         .param("size", "-1")
@@ -350,7 +350,7 @@ class BookingControllerTest {
     void getBookingsForAllItems_400_error() throws Exception {
         objectMapper.registerModule(new JavaTimeModule());
         when(bookingService.getBookingsForAllItems(anyLong(), any(BookingState.class), any(), any()))
-                .thenThrow(PageParamException.class);
+                .thenThrow(BookingValidationException.class);
         mockMvc.perform(get("/bookings/owner")
                         .param("from", "0")
                         .param("size", "-1")
