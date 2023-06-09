@@ -60,7 +60,7 @@ class ItemRequestControllerTest {
         ItemRequestDto body = ItemRequestTestData.getItemReqDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(itemRequestService.createRequest(anyLong(), any(ItemRequestDto.class)))
-                .thenReturn(itemRequestDto);
+                .thenReturn(body);
 
         mockMvc.perform(post("/requests")
                         .content(objectMapper.writeValueAsString(body))

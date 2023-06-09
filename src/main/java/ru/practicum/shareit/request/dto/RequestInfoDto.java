@@ -4,6 +4,7 @@ import lombok.Data;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,5 +16,11 @@ public class RequestInfoDto {
 
     private LocalDateTime created;
 
-    private List<ItemDto> items;
+    private Long requestId;
+
+    private List<ItemDto> items = new ArrayList<>();
+
+    public void setItems(List<ItemDto> newItems) {
+        items.addAll(newItems);
+    }
 }

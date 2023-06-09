@@ -41,13 +41,13 @@ public class ItemRequestService {
 
 
     @Transient
-    public RequestInfoDto createRequest(Long userId, ItemRequestDto itemRequestDto) {
+    public ItemRequestDto createRequest(Long userId, ItemRequestDto itemRequestDto) {
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         ItemRequest itemRequest = requestMapper.fromDto(itemRequestDto);
         itemRequest.setRequest(owner);
         itemRequest.setCreated(LocalDateTime.now());
         log.info("Item request create {}", itemRequest);
-        return requestMapper.toInfoDto(requestRepository.save(itemRequest));
+        return requestMapper.toDto(requestRepository.save(itemRequest));
     }
 
     @Transactional(readOnly = true)
@@ -55,34 +55,35 @@ public class ItemRequestService {
         User request = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Get all item requests by user id {}", userId);
         Sort sort = Sort.by("created").descending();
-        List<ItemRequest> requests = requestRepository.findAllByRequestId(request.getId(), sort);
-        requests.forEach(req -> req.getItems().addAll(getItemsByReq(req.getRequest().getId(), userId)));
-        return requestMapper.toListInfoDto(requests);
+        List<RequestInfoDto> requests = requestMapper.toListInfoDto(requestRepository.findAllByRequestId(request.getId(), sort));
+        requests.forEach(req -> req.setItems(getItemsByReq(req.getRequestId())));
+        return requests;
     }
 
     @Transactional(readOnly = true)
     public List<RequestInfoDto> getAllRequests(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Sort sort = Sort.by("created").descending();
-        Pageable sortedByCreated = PageRequest.of(from, size, sort);
+        Pageable sortedByCreated = PageRequest.of(from / size, size, sort);
         log.info("Get all request user id = {} and page = {} and size = {}", userId, from, size);
-        List<ItemRequest> itemRequests = requestRepository.findByRequestIdNot(userId, sortedByCreated);
+        List<RequestInfoDto> itemRequests = requestMapper.toListInfoDto(
+                requestRepository.findByRequestIdNot(userId, sortedByCreated));
         log.info("Items req size = {}", itemRequests.size());
-        itemRequests.forEach(req -> req.getItems().addAll(getItemsByReq(req.getRequest().getId(), userId)));
-        return requestMapper.toListInfoDto(itemRequests);
+        itemRequests.forEach(req -> req.setItems(getItemsByReq(req.getRequestId())));
+        return itemRequests;
     }
 
     @Transactional(readOnly = true)
     public RequestInfoDto getItemRequestById(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Get item requests by id = {}", requestId);
-        ItemRequest itemRequest = requestRepository.findById(requestId)
-                .orElseThrow(() -> new ItemRequestNotFoundException(requestId));
-        itemRequest.getItems().addAll(getItemsByReq(itemRequest.getRequest().getId(), userId));
-        return requestMapper.toInfoDto(itemRequest);
+        RequestInfoDto itemRequest = requestMapper.toInfoDto(requestRepository.findById(requestId)
+                .orElseThrow(() -> new ItemRequestNotFoundException(requestId)));
+        itemRequest.setItems(getItemsByReq(itemRequest.getRequestId()));
+        return itemRequest;
     }
 
-    private List<ItemDto> getItemsByReq(Long requestId, Long userId) {
+    private List<ItemDto> getItemsByReq(Long requestId) {
         List<Item> items = itemRepository.findAllByRequestId(requestId);
         log.info("Items size = {}", items.size());
         if (items.isEmpty()) {

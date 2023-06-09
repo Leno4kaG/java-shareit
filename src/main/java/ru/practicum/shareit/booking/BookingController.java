@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@Validated
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
@@ -47,17 +49,17 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getBookingsForCurrentUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+    public List<BookingDto> getBookingsForCurrentUser(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                       @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                                      @RequestHeader("X-Sharer-User-Id") long userId,
                                                       @RequestParam(name = "state", defaultValue = "ALL") BookingState state) {
         return bookingService.getBookingsForCurrentUser(userId, state, from, size);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getBookingsForAllItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                   @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+    public List<BookingDto> getBookingsForAllItems(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                    @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                                   @RequestHeader("X-Sharer-User-Id") long userId,
                                                    @RequestParam(name = "state", defaultValue = "ALL") BookingState state) {
 
         return bookingService.getBookingsForAllItems(userId, state, from, size);

@@ -46,9 +46,9 @@ class ItemRequestServiceIntegrationTest {
     @Test
     void createRequestTest() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
-        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
-        assertEquals(itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId()), itemRequestDto);
+        assertEquals(ItemRequestTestData.getItemReqDto().getDescription(), itemRequestDto.getDescription());
 
         assertThrows(UserNotFoundException.class, () -> itemRequestService.createRequest(12L,
                 ItemRequestTestData.getItemReqDto()));
@@ -58,7 +58,7 @@ class ItemRequestServiceIntegrationTest {
     void getItemRequestByIdTest() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto booker = userService.createUser(UserTestData.getUserDtoOwner());
-        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         ItemDto itemDto = ItemTestData.getItemDto();
         itemDto.setRequestId(itemRequestDto.getId());
@@ -81,7 +81,7 @@ class ItemRequestServiceIntegrationTest {
     void getAllRequestsForOwner() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto booker = userService.createUser(UserTestData.getUserDtoOwner());
-        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         ItemDto itemDto = ItemTestData.getItemDto();
         itemDto.setRequestId(itemRequestDto.getId());
@@ -101,20 +101,20 @@ class ItemRequestServiceIntegrationTest {
         UserDto user = userService.createUser(UserTestData.getUserDto());
         UserDto user1 = userService.createUser(UserTestData.getUserDtoOwner());
         ItemRequestDto reqDto = ItemRequestTestData.getItemReqDto();
-        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(), reqDto);
+        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(), reqDto);
 
         List<RequestInfoDto> list = itemRequestService.getAllRequests(user1.getId(), 0, 1);
 
-        assertEquals(List.of(itemRequestDto), list);
+        assertEquals(itemRequestDto.getDescription(), list.get(0).getDescription());
     }
 
     @Test
     void getItemRequestById() {
         UserDto user = userService.createUser(UserTestData.getUserDto());
-        RequestInfoDto itemRequestDto = itemRequestService.createRequest(user.getId(),
+        ItemRequestDto itemRequestDto = itemRequestService.createRequest(user.getId(),
                 ItemRequestTestData.getItemReqDto());
         RequestInfoDto result = itemRequestService.getItemRequestById(user.getId(), itemRequestDto.getId());
 
-        assertEquals(itemRequestDto, result);
+        assertEquals(itemRequestDto.getId(), result.getId());
     }
 }

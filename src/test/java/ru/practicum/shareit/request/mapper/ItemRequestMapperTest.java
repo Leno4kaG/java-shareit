@@ -1,9 +1,6 @@
 package ru.practicum.shareit.request.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -28,11 +25,9 @@ class ItemRequestMapperTest {
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
         Item item = ItemTestData.getItem();
         item.setRequest(itemRequest);
-        Booking booking = BookingTestData.getBooking();
-        booking.setItem(item);
         ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
         itemRequestDto.setCreated(itemRequest.getCreated());
-        ReflectionTestUtils.setField(itemRequest, "items", List.of(itemMapper.toDto(item)));
+
 
         ItemRequestDto result = itemRequestMapper.toDto(itemRequest);
 

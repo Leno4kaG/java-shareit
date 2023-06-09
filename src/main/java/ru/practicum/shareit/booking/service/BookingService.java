@@ -112,14 +112,14 @@ public class BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForCurrentUser(Long userId, BookingState state, Integer from, Integer size) {
         User user = findUser(userId);
-        return bookingMapper.toListDto(getBookings(state, user, from, size));
+        return bookingMapper.toListDto(getBookings(state, user, from / size, size));
     }
 
     @Transactional(readOnly = true)
     public List<BookingDto> getBookingsForAllItems(Long userId, BookingState state, Integer from, Integer size) {
         User owner = findUser(userId);
         List<Item> itemList = itemRepository.findAllByOwnerId(owner.getId());
-        List<Booking> bookings = getBookingsByItem(state, itemList, from, size);
+        List<Booking> bookings = getBookingsByItem(state, itemList, from / size, size);
         return bookingMapper.toListDto(bookings);
     }
 
@@ -129,7 +129,6 @@ public class BookingService {
         Pageable sortedByStart = PageRequest.of(from, size, sort);
         LocalDateTime date = LocalDateTime.now();
         if (BookingState.ALL.equals(state)) {
-            if (from > size) from = size;
             Pageable sortedByStartAll = PageRequest.of(from, size, sort);
             return bookingRepository.findAllByBookerId(booker.getId(), sortedByStartAll);
         } else if (BookingState.CURRENT.equals(state)) {

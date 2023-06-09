@@ -89,14 +89,14 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemWithBooking> getAllItems(long userId, Integer from, Integer size) {
         Sort sort = Sort.by("id").ascending();
-        Pageable pageable = PageRequest.of(from, size, sort);
+        Pageable pageable = PageRequest.of(from / size, size, sort);
         List<Item> items = itemRepository.findAllByOwnerId(userId, pageable);
         return getItemsWithBooking(items, userId);
     }
 
     @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String text, long userId, Integer from, Integer size) {
-        Pageable pageable = PageRequest.of(from, size);
+        Pageable pageable = PageRequest.of(from / size, size);
         return itemMapper.toListDto(itemRepository.searchItems(text, pageable));
     }
 

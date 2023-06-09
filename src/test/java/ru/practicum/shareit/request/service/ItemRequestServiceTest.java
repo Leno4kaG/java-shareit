@@ -47,13 +47,13 @@ class ItemRequestServiceTest {
     void createRequestWhenDataCorrect() {
         User user = UserTestData.getUser();
         ItemRequest itemRequest = ItemRequestTestData.getItemReq();
-        RequestInfoDto itemRequestDto = ItemRequestTestData.getItemReqInfoDto();
+        ItemRequestDto itemRequestDto = ItemRequestTestData.getItemReqDto();
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestMapper.fromDto(any())).thenReturn(itemRequest);
-        when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
+        when(requestMapper.toDto(any())).thenReturn(itemRequestDto);
 
-        RequestInfoDto result = itemRequestService.createRequest(user.getId(), ItemRequestTestData.getItemReqDto());
+        ItemRequestDto result = itemRequestService.createRequest(user.getId(), ItemRequestTestData.getItemReqDto());
 
         assertEquals(itemRequestDto, result);
     }
@@ -115,7 +115,8 @@ class ItemRequestServiceTest {
         Page<ItemRequest> page = new PageImpl<>(List.of(itemRequest).subList(0, 1), pageable, 1);
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(requestRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class))).
+                thenReturn(List.of(ItemRequestTestData.getItemReq()));
         when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
         when(requestMapper.toListInfoDto(any())).thenReturn(List.of(itemRequestDto));
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
@@ -135,7 +136,8 @@ class ItemRequestServiceTest {
         List<Item> items = List.of(ItemTestData.getItem());
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(requestRepository.findAll(any(Pageable.class))).thenReturn(null);
+        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class))).
+                thenReturn(null);
         when(requestMapper.toInfoDto(any())).thenReturn(null);
         when(requestMapper.toListInfoDto(any())).thenReturn(List.of());
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
@@ -155,6 +157,8 @@ class ItemRequestServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(requestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
         when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
+        when(itemRepository.findAllByRequestId(any())).thenReturn(List.of(ItemTestData.getItem()));
+        when(itemMapper.toListDto(any())).thenReturn(List.of(ItemTestData.getItemDto()));
 
         RequestInfoDto result = itemRequestService.getItemRequestById(user.getId(), itemRequest.getId());
 
