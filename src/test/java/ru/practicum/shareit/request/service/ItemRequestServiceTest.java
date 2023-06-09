@@ -115,8 +115,8 @@ class ItemRequestServiceTest {
         Page<ItemRequest> page = new PageImpl<>(List.of(itemRequest).subList(0, 1), pageable, 1);
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class))).
-                thenReturn(List.of(ItemRequestTestData.getItemReq()));
+        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class)))
+                .thenReturn(List.of(ItemRequestTestData.getItemReq()));
         when(requestMapper.toInfoDto(any())).thenReturn(itemRequestDto);
         when(requestMapper.toListInfoDto(any())).thenReturn(List.of(itemRequestDto));
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
@@ -136,8 +136,8 @@ class ItemRequestServiceTest {
         List<Item> items = List.of(ItemTestData.getItem());
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class))).
-                thenReturn(null);
+        when(requestRepository.findByRequestIdNot(anyLong(), any(Pageable.class)))
+                .thenReturn(null);
         when(requestMapper.toInfoDto(any())).thenReturn(null);
         when(requestMapper.toListInfoDto(any())).thenReturn(List.of());
         when(itemRepository.findAllByRequestId(any())).thenReturn(items);
