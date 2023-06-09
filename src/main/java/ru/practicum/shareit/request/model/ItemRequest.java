@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * TODO Sprint add-item-requests.
+ * Таблица запросов для добавления вещей.
  */
 @Data
 @Entity

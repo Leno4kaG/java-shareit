@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
-
+    @Mapping(target = "requestId", source = "item.request.id")
     ItemDto toDto(Item item);
 
     @Mapping(target = "owner", ignore = true)
@@ -20,9 +20,8 @@ public interface ItemMapper {
     @Mapping(target = "lastBooking", ignore = true)
     @Mapping(target = "nextBooking", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "requestId", source = "item.request.id")
     ItemWithBooking toItemWithBooking(Item item);
 
     List<ItemDto> toListDto(List<Item> itemList);
-
-    List<Item> fromListDto(List<ItemDto> itemDtoList);
 }
