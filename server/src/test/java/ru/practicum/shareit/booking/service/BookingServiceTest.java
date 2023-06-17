@@ -65,8 +65,8 @@ class BookingServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(UserTestData.getUser()));
 
         when(bookingMapper.toBookingDto(any(BookingRequestDto.class))).thenReturn(bookingDto);
-        when(userMapper.toDto(any(User.class))).thenReturn(bookingDto.getBooker());
-        when(itemMapper.toDto(any())).thenReturn(bookingDto.getItem());
+        when(userMapper.toClientDto(any(User.class))).thenReturn(bookingDto.getBooker());
+        when(itemMapper.toClientDto(any())).thenReturn(bookingDto.getItem());
 
         BookingDto result = bookingService.createBooking(userId, bookingRequestDto);
 

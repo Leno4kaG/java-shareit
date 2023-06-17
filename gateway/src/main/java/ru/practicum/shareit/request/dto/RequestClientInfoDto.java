@@ -1,7 +1,7 @@
 package ru.practicum.shareit.request.dto;
 
 import lombok.Data;
-import ru.practicum.shareit.item.dto.ItemClientDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,9 +18,9 @@ public class RequestClientInfoDto {
 
     private Long requestId;
 
-    private List<ItemClientDto> items = new ArrayList<>();
+    private List<ItemDto> items = new ArrayList<>();
 
-    public void setItems(List<ItemClientDto> newItems) {
+    public void setItems(List<ItemDto> newItems) {
         items.addAll(newItems);
     }
 }

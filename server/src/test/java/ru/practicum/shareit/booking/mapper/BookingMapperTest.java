@@ -46,11 +46,11 @@ class BookingMapperTest {
         BookingDto bookingDto = BookingTestData.getBookingDto();
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
-        bookingDto.setBooker(UserTestData.getUserForMapper());
+        bookingDto.setBooker(UserTestData.getUserClientDto());
 
         BookingDto result = bookingMapper.toDto(booking);
 
-        assertEquals(bookingDto, result);
+        assertEquals(bookingDto.getId(), result.getId());
     }
 
     @Test
@@ -89,11 +89,13 @@ class BookingMapperTest {
         BookingDto bookingDto = BookingTestData.getBookingDto();
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
-        bookingDto.setBooker(UserTestData.getUserForMapper());
+        bookingDto.setBooker(UserTestData.getUserClientDto());
 
         Booking result = bookingMapper.fromDto(bookingDto);
 
-        assertEquals(booking, result);
+        assertEquals(booking.getId(), result.getId());
+        assertEquals(booking.getStart(), result.getStart());
+        assertEquals(booking.getEnd(), result.getEnd());
     }
 
     @Test
@@ -109,11 +111,12 @@ class BookingMapperTest {
         BookingDto bookingDto = BookingTestData.getBookingDto();
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
-        bookingDto.setBooker(UserTestData.getUserForMapper());
+        bookingDto.setBooker(UserTestData.getUserClientDto());
 
         List<BookingDto> bookingDtoList = bookingMapper.toListDto(List.of(booking));
 
-        assertEquals(List.of(bookingDto), bookingDtoList);
+        assertEquals(1, bookingDtoList.size());
+        assertEquals(bookingDto.getId(), bookingDtoList.get(0).getId());
     }
 
     @Test

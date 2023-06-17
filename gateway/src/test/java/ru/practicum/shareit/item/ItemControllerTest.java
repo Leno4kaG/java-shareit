@@ -18,8 +18,8 @@ import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.exception.CommentClientValidationException;
 import ru.practicum.shareit.exception.ErrorClientHandler;
 import ru.practicum.shareit.exception.ItemClientNotFoundException;
-import ru.practicum.shareit.item.dto.ItemClientDto;
 import ru.practicum.shareit.item.dto.ItemClientWithBooking;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -56,9 +56,9 @@ class ItemControllerTest {
 
     @Test
     void createItemWhen_data_correct_201_ok() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.createItem(anyLong(), any(ItemClientDto.class)))
+        when(itemService.createItem(anyLong(), any(ItemDto.class)))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(itemDto));
 
         mockMvc.perform(post("/items")
@@ -76,9 +76,9 @@ class ItemControllerTest {
 
     @Test
     void createItemWhen_404_error() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.createItem(anyLong(), any(ItemClientDto.class)))
+        when(itemService.createItem(anyLong(), any(ItemDto.class)))
                 .thenThrow(ItemClientNotFoundException.class);
 
         mockMvc.perform(post("/items")
@@ -92,9 +92,9 @@ class ItemControllerTest {
 
     @Test
     void createItemWhen_500_error() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.createItem(anyLong(), any(ItemClientDto.class)))
+        when(itemService.createItem(anyLong(), any(ItemDto.class)))
                 .thenThrow(RuntimeException.class);
 
         mockMvc.perform(post("/items")
@@ -108,10 +108,10 @@ class ItemControllerTest {
 
     @Test
     void updateItemDtoWhen_data_correct_200_ok() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         ItemClientWithBooking itemWithBooking = ItemTestData.getItemWithBooking();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.updateItemDto(anyLong(), any(ItemClientDto.class), anyLong()))
+        when(itemService.updateItemDto(anyLong(), any(ItemDto.class), anyLong()))
                 .thenReturn(ResponseEntity.ok(itemWithBooking));
 
         mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
@@ -130,9 +130,9 @@ class ItemControllerTest {
 
     @Test
     void updateItemDtoWhen_404_error() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.updateItemDto(anyLong(), any(ItemClientDto.class), anyLong()))
+        when(itemService.updateItemDto(anyLong(), any(ItemDto.class), anyLong()))
                 .thenThrow(ItemClientNotFoundException.class);
 
         mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
@@ -146,9 +146,9 @@ class ItemControllerTest {
 
     @Test
     void updateItemDtoWhen_500_error() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
+        ItemDto itemDto = ItemTestData.getItemDto();
         objectMapper.registerModule(new JavaTimeModule());
-        when(itemService.updateItemDto(anyLong(), any(ItemClientDto.class), anyLong()))
+        when(itemService.updateItemDto(anyLong(), any(ItemDto.class), anyLong()))
                 .thenThrow(RuntimeException.class);
 
         mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
@@ -261,8 +261,8 @@ class ItemControllerTest {
 
     @Test
     void searchItemsWhen_200_OK() throws Exception {
-        ItemClientDto itemDto = ItemTestData.getItemDto();
-        when(itemService.searchItems(any(), any(),anyString(), anyLong()))
+        ItemDto itemDto = ItemTestData.getItemDto();
+        when(itemService.searchItems(any(), any(), anyString(), anyLong()))
                 .thenReturn(ResponseEntity.ok(List.of(itemDto)));
 
         mockMvc.perform(get("/items/search")
@@ -296,7 +296,7 @@ class ItemControllerTest {
 
     @Test
     void searchItemsWhen_404_OK() throws Exception {
-        when(itemService.searchItems(any(), any(),anyString(), anyLong()))
+        when(itemService.searchItems(any(), any(), anyString(), anyLong()))
                 .thenThrow(ItemClientNotFoundException.class);
 
         mockMvc.perform(get("/items/search")
@@ -312,7 +312,7 @@ class ItemControllerTest {
 
     @Test
     void searchItemsWhen_500_OK() throws Exception {
-        when(itemService.searchItems(any(), any(),anyString(), anyLong()))
+        when(itemService.searchItems(any(), any(), anyString(), anyLong()))
                 .thenThrow(RuntimeException.class);
 
         mockMvc.perform(get("/items/search")

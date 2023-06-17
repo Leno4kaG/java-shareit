@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import ru.practicum.shareit.data.UserTestData;
-import ru.practicum.shareit.user.dto.UserClientDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class UserClientTest {
 
     @Test
     public void createUser() throws JsonProcessingException {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
         String body = objectMapper.writeValueAsString(userClientDto);
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX))
@@ -54,7 +54,7 @@ public class UserClientTest {
 
     @Test
     public void createUserWhenBadReq() {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX))
                 .andExpect(method(HttpMethod.POST))
@@ -66,7 +66,7 @@ public class UserClientTest {
 
     @Test
     public void getUserById() throws JsonProcessingException {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
         String body = objectMapper.writeValueAsString(userClientDto);
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX + "/1"))
@@ -93,7 +93,7 @@ public class UserClientTest {
 
     @Test
     public void updateUser() throws JsonProcessingException {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
         String body = objectMapper.writeValueAsString(userClientDto);
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX + "/1"))
@@ -109,7 +109,7 @@ public class UserClientTest {
 
     @Test
     public void updateUserWhenNotFound() {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX + "/99"))
                 .andExpect(method(HttpMethod.PATCH))
@@ -132,7 +132,7 @@ public class UserClientTest {
 
     @Test
     public void getAllUsers() throws JsonProcessingException {
-        UserClientDto userClientDto = UserTestData.getUserDto();
+        UserDto userClientDto = UserTestData.getUserDto();
         String body = objectMapper.writeValueAsString(List.of(userClientDto));
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX))

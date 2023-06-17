@@ -14,8 +14,8 @@ public class BookingTestData {
         BookingClientDto booking = new BookingClientDto();
         booking.setId(1);
         booking.setStatus(BookingClientStatus.WAITING);
-        booking.setItem(ItemTestData.getItemDto());
-        booking.setBooker(UserTestData.getUserDto());
+        booking.setItem(ItemTestData.getItemClientDto());
+        booking.setBooker(UserTestData.getUserClientDto());
         booking.setStart(LocalDateTime.now());
         booking.setEnd(LocalDateTime.now().plusMinutes(5));
         return booking;

@@ -24,28 +24,28 @@ public class ErrorClientHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorClientDto handleUserNotFound(ItemClientNotFoundException e) {
+    public ErrorClientDto handleItemNotFound(ItemClientNotFoundException e) {
         log.error("Item with id {} not found", e.getItemId());
         return new ErrorClientDto("Товар не найден");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorClientDto handleUserNotFound(BookingClientNotFoundException e) {
+    public ErrorClientDto handleBookingNotFound(BookingClientNotFoundException e) {
         log.error("Booking with id {} not found", e.getBookingId());
         return new ErrorClientDto("Бронирование не найдено");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorClientDto handleUserNotFound(ItemRequestClientNotFoundException e) {
+    public ErrorClientDto handleItemReqNotFound(ItemRequestClientNotFoundException e) {
         log.error("Item request with id {} not found", e.getItemRequestId());
         return new ErrorClientDto("Запрос на добавление товара/вещи не найден");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorClientDto handleUserNotFound(ValidationClientException e) {
+    public ErrorClientDto handleValidationException(ValidationClientException e) {
         log.error(e.getMessage());
         return new ErrorClientDto("Ошибка валидации");
     }
@@ -60,28 +60,28 @@ public class ErrorClientHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorClientDto handleMethodArgumentNotValidException(BookingClientValidationException e) {
+    public ErrorClientDto handleBookingValidException(BookingClientValidationException e) {
         log.error(e.getMessage());
         return new ErrorClientDto("Ошибка валидации");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorClientDto handleMethodArgumentNotValidException(CommentClientValidationException e) {
+    public ErrorClientDto handleCommentValidException(CommentClientValidationException e) {
         log.error(e.getMessage());
         return new ErrorClientDto("Ошибка валидации");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorClientDto handleUserNotFound(BookingClientException e) {
+    public ErrorClientDto handleBookingException(BookingClientException e) {
         log.error(e.getMessage());
         return new ErrorClientDto(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorClientDto handleUserNotFound(Exception e) {
+    public ErrorClientDto handleOtherException(Exception e) {
         log.error(e.getMessage());
         return new ErrorClientDto("Произошла непредвиденная ошибка.");
     }

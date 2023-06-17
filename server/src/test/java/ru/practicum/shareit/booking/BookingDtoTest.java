@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.data.BookingTestData;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.item.dto.ItemClientDto;
+import ru.practicum.shareit.user.dto.UserClientDto;
 
 import java.time.LocalDateTime;
 
@@ -77,7 +77,7 @@ class BookingDtoTest {
     @Test
     void setItem() {
         BookingDto bookingDto = BookingTestData.getBookingDto();
-        ItemDto itemDto = new ItemDto();
+        ItemClientDto itemDto = new ItemClientDto();
         bookingDto.setItem(itemDto);
         assertEquals(itemDto, bookingDto.getItem());
     }
@@ -85,7 +85,7 @@ class BookingDtoTest {
     @Test
     void setBooker() {
         BookingDto bookingDto = BookingTestData.getBookingDto();
-        UserDto userDto = new UserDto();
+        UserClientDto userDto = new UserClientDto();
         bookingDto.setBooker(userDto);
         assertEquals(userDto, bookingDto.getBooker());
     }

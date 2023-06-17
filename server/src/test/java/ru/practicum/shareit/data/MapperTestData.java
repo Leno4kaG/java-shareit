@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.item.dto.ItemClientDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.RequestInfoDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.dto.UserClientDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -43,6 +45,20 @@ public class MapperTestData {
             }
 
             @Override
+            public UserClientDto toClientDto(User user) {
+                if (user == null) {
+                    return null;
+                }
+
+                UserClientDto userDto = new UserClientDto();
+
+                userDto.setId(user.getId());
+                userDto.setEmail(user.getEmail());
+
+                return userDto;
+            }
+
+            @Override
             public User fromDto(UserDto userDto) {
                 if (userDto == null) {
                     return null;
@@ -52,6 +68,20 @@ public class MapperTestData {
 
                 user.setId(userDto.getId());
                 user.setName(userDto.getName());
+                user.setEmail(userDto.getEmail());
+
+                return user;
+            }
+
+            @Override
+            public User fromDto(UserClientDto userDto) {
+                if (userDto == null) {
+                    return null;
+                }
+
+                User user = new User();
+
+                user.setId(userDto.getId());
                 user.setEmail(userDto.getEmail());
 
                 return user;
@@ -102,8 +132,8 @@ public class MapperTestData {
                 }
                 bookingDto.setStart(booking.getStart());
                 bookingDto.setEnd(booking.getEnd());
-                bookingDto.setItem(getItemMapper().toDto(booking.getItem()));
-                bookingDto.setBooker(getUserMapper().toDto(booking.getBooker()));
+                bookingDto.setItem(getItemMapper().toClientDto(booking.getItem()));
+                bookingDto.setBooker(getUserMapper().toClientDto(booking.getBooker()));
                 bookingDto.setStatus(booking.getStatus());
 
                 return bookingDto;
@@ -134,7 +164,7 @@ public class MapperTestData {
                 booking.setId(bookingClientDto.getId());
                 booking.setStart(bookingClientDto.getStart());
                 booking.setEnd(bookingClientDto.getEnd());
-                booking.setItem(getItemMapper().fromDto(bookingClientDto.getItem()));
+                booking.setItem(getItemMapper().fromClientDto(bookingClientDto.getItem()));
                 booking.setBooker(getUserMapper().fromDto(bookingClientDto.getBooker()));
                 booking.setStatus(bookingClientDto.getStatus());
 
@@ -189,6 +219,20 @@ public class MapperTestData {
             }
 
             @Override
+            public ItemClientDto toClientDto(Item item) {
+                if (item == null) {
+                    return null;
+                }
+
+                ItemClientDto itemDto = new ItemClientDto();
+
+                itemDto.setId(item.getId());
+                itemDto.setName(item.getName());
+
+                return itemDto;
+            }
+
+            @Override
             public Item fromDto(ItemDto itemDto) {
                 if (itemDto == null) {
                     return null;
@@ -201,6 +245,19 @@ public class MapperTestData {
                 item.setDescription(itemDto.getDescription());
                 item.setAvailable(itemDto.getAvailable());
 
+                return item;
+            }
+
+            @Override
+            public Item fromClientDto(ItemClientDto itemClientDto) {
+                if (itemClientDto == null) {
+                    return null;
+                }
+
+                Item item = new Item();
+
+                item.setId(itemClientDto.getId());
+                item.setName(itemClientDto.getName());
                 return item;
             }
 
@@ -233,6 +290,11 @@ public class MapperTestData {
                 }
 
                 return list;
+            }
+
+            @Override
+            public List<ItemClientDto> toListClientDto(List<Item> itemList) {
+                return null;
             }
 
             private Long itemRequestId(Item item) {

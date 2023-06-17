@@ -2,6 +2,7 @@ package ru.practicum.shareit.data;
 
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.item.dto.ItemClientDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBooking;
 import ru.practicum.shareit.item.model.Item;
@@ -29,6 +30,13 @@ public class ItemTestData {
         item.setDescription("test item description");
         item.setRequestId(ItemRequestTestData.getItemReq().getId());
         item.setAvailable(true);
+        return item;
+    }
+
+    public static ItemClientDto getItemClientDto() {
+        ItemClientDto item = new ItemClientDto();
+        item.setId(1L);
+        item.setName("test item");
         return item;
     }
 

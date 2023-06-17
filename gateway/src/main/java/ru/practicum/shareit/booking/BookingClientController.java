@@ -7,10 +7,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingClientRequestDto;
 import ru.practicum.shareit.booking.dto.BookingClientState;
+import ru.practicum.shareit.exception.BookingClientValidationException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 /**
  * Контроллер бронирования
@@ -28,6 +30,7 @@ public class BookingClientController {
     public ResponseEntity<Object> createBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                                 @Valid @RequestBody BookingClientRequestDto bookingClientRequestDto) {
         log.info("Create booking with user id {},booking client={}", userId, bookingClientRequestDto);
+        validationDate(bookingClientRequestDto.getStart(), bookingClientRequestDto.getEnd());
         return bookingService.createBooking(userId, bookingClientRequestDto);
     }
 
@@ -60,5 +63,20 @@ public class BookingClientController {
                                                          @RequestParam(name = "state", defaultValue = "ALL") BookingClientState state) {
 
         return bookingService.getBookingsForAllItems(userId, state, from, size);
+    }
+
+    private void validationDate(LocalDateTime startDate, LocalDateTime endDate) {
+        if (endDate.isBefore(LocalDateTime.now())) {
+            log.error("End date in past");
+            throw new BookingClientValidationException();
+        }
+        if (endDate.isBefore(startDate) || startDate.equals(endDate)) {
+            log.error("End date is before start date {}  {}", startDate, endDate);
+            throw new BookingClientValidationException();
+        }
+        if (startDate.isBefore(LocalDateTime.now())) {
+            log.error("Start date in past");
+            throw new BookingClientValidationException();
+        }
     }
 }

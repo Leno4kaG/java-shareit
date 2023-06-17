@@ -29,7 +29,7 @@ class UserServiceTest {
         User user = UserTestData.getUser();
         UserDto userDto = UserTestData.getUserDto();
 
-        when(userMapper.fromDto(any())).thenReturn(user);
+        when(userMapper.fromDto(any(UserDto.class))).thenReturn(user);
         when(userRepository.save(any())).thenReturn(user);
         when(userMapper.toDto(any())).thenReturn(userDto);
 

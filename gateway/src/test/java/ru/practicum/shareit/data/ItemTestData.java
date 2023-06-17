@@ -3,6 +3,7 @@ package ru.practicum.shareit.data;
 import ru.practicum.shareit.comment.dto.CommentClientDto;
 import ru.practicum.shareit.item.dto.ItemClientDto;
 import ru.practicum.shareit.item.dto.ItemClientWithBooking;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +11,15 @@ import java.util.List;
 public class ItemTestData {
 
 
-    public static ItemClientDto getItemDto() {
+    public static ItemClientDto getItemClientDto() {
         ItemClientDto item = new ItemClientDto();
+        item.setId(1L);
+        item.setName("test item");
+        return item;
+    }
+
+    public static ItemDto getItemDto() {
+        ItemDto item = new ItemDto();
         item.setId(1L);
         item.setName("test item");
         item.setDescription("test item description");

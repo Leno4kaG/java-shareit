@@ -14,7 +14,7 @@ import ru.practicum.shareit.data.BookingTestData;
 import ru.practicum.shareit.data.ItemRequestTestData;
 import ru.practicum.shareit.data.ItemTestData;
 import ru.practicum.shareit.data.UserTestData;
-import ru.practicum.shareit.exception.BookingValidationException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -57,7 +57,7 @@ public class BookingServiceIntegrationTest {
     }
 
     @Test
-    void createBookingValidationError() {
+    void createBookingError() {
         UserDto userDto = userService.createUser(UserTestData.getUserDto());
         UserDto userDto1 = userService.createUser(UserTestData.getUserDtoOwner());
         itemRequestService.createRequest(userDto.getId(), ItemRequestTestData.getItemReqDto());
@@ -66,14 +66,8 @@ public class BookingServiceIntegrationTest {
         bookingRequestDto.setItemId(item.getId());
         bookingRequestDto.setEnd(LocalDateTime.now().minusMinutes(5));
 
-        assertThrows(BookingValidationException.class,
-                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
-        bookingRequestDto.setEnd(bookingRequestDto.getEnd());
-        assertThrows(BookingValidationException.class,
-                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
-        bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(40));
-        assertThrows(BookingValidationException.class,
-                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+        assertThrows(UserNotFoundException.class,
+                () -> bookingService.createBooking(12L, bookingRequestDto));
     }
 
     @Test
@@ -87,12 +81,8 @@ public class BookingServiceIntegrationTest {
         bookingRequestDto.setStart(LocalDateTime.now().plusMinutes(2));
         bookingRequestDto.setEnd(bookingRequestDto.getStart().minusMinutes(1));
 
-        assertThrows(BookingValidationException.class,
-                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
-        bookingRequestDto.setStart(LocalDateTime.now().minusMinutes(2));
-        bookingRequestDto.setEnd(LocalDateTime.now().plusMinutes(10));
-        assertThrows(BookingValidationException.class,
-                () -> bookingService.createBooking(userDto1.getId(), bookingRequestDto));
+        assertThrows(UserNotFoundException.class,
+                () -> bookingService.createBooking(12L, bookingRequestDto));
     }
 
     @Test

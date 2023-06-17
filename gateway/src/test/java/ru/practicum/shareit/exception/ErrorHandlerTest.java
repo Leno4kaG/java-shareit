@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ErrorHandlerTest {
 
     @Test
-    void handleUserNotFound() {
+    void handleValidationException() {
         ErrorClientHandler errorHandler = new ErrorClientHandler();
-        ErrorClientDto errorDto = errorHandler.handleUserNotFound(new ValidationClientException());
+        ErrorClientDto errorDto = errorHandler.handleValidationException(new ValidationClientException());
         assertEquals("Ошибка валидации", errorDto.getError());
     }
 }

@@ -62,11 +62,10 @@ public class BookingService {
             log.error("Available = false");
             throw new BookingValidationException();
         }
-        validationDate(bookingRequestDto.getStart(), bookingRequestDto.getEnd());
         BookingDto bookingClientDto = bookingMapper.toBookingDto(bookingRequestDto);
         bookingClientDto.setStatus(BookingStatus.WAITING);
-        bookingClientDto.setBooker(userMapper.toDto(user));
-        bookingClientDto.setItem(itemMapper.toDto(item));
+        bookingClientDto.setBooker(userMapper.toClientDto(user));
+        bookingClientDto.setItem(itemMapper.toClientDto(item));
 
         Booking booking = bookingMapper.fromDto(bookingClientDto);
         bookingClientDto.setId(bookingRepository.save(booking).getId());
@@ -171,20 +170,6 @@ public class BookingService {
         return bookings;
     }
 
-    private void validationDate(LocalDateTime startDate, LocalDateTime endDate) {
-        if (endDate.isBefore(LocalDateTime.now())) {
-            log.error("End date in past");
-            throw new BookingValidationException();
-        }
-        if (endDate.isBefore(startDate) || startDate.equals(endDate)) {
-            log.error("End date is before start date {}  {}", startDate, endDate);
-            throw new BookingValidationException();
-        }
-        if (startDate.isBefore(LocalDateTime.now())) {
-            log.error("Start date in past");
-            throw new BookingValidationException();
-        }
-    }
 
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));

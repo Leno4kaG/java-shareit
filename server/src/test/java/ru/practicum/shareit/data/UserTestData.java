@@ -1,5 +1,6 @@
 package ru.practicum.shareit.data;
 
+import ru.practicum.shareit.user.dto.UserClientDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -29,10 +30,24 @@ public class UserTestData {
         return user;
     }
 
+    public static UserClientDto getUserClientDto() {
+        UserClientDto user = new UserClientDto();
+        user.setId(1);
+        user.setEmail("test-dto@email");
+        return user;
+    }
+
     public static UserDto getUserDtoOwner() {
         UserDto user = new UserDto();
         user.setId(2);
         user.setName("Test owner");
+        user.setEmail("owner@email");
+        return user;
+    }
+
+    public static UserClientDto getUserClientDtoOwner() {
+        UserClientDto user = new UserClientDto();
+        user.setId(2);
         user.setEmail("owner@email");
         return user;
     }

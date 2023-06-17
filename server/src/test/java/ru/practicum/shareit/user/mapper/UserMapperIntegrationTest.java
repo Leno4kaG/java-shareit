@@ -58,7 +58,7 @@ public class UserMapperIntegrationTest {
     @Test
     void fromDtoWhenNull() {
 
-        User result = userMapper.fromDto(null);
+        User result = userMapper.fromDto((UserDto) null);
 
         assertNull(result);
     }

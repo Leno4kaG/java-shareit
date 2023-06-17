@@ -17,7 +17,7 @@ import ru.practicum.shareit.data.UserTestData;
 import ru.practicum.shareit.exception.ErrorClientHandler;
 import ru.practicum.shareit.exception.UserClientNotFoundException;
 import ru.practicum.shareit.exception.ValidationClientException;
-import ru.practicum.shareit.user.dto.UserClientDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -55,7 +55,7 @@ class UserControllerTest {
 
     @Test
     void createUserWhen_201_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.createUser(any()))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(userDto));
@@ -73,7 +73,7 @@ class UserControllerTest {
 
     @Test
     void createUserWhen_409_error() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.createUser(any()))
                 .thenThrow(ValidationClientException.class);
@@ -88,7 +88,7 @@ class UserControllerTest {
 
     @Test
     void createUserWhen_404_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.createUser(any()))
                 .thenThrow(UserClientNotFoundException.class);
@@ -103,7 +103,7 @@ class UserControllerTest {
 
     @Test
     void createUserWhen_500_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.createUser(any()))
                 .thenThrow(RuntimeException.class);
@@ -118,7 +118,7 @@ class UserControllerTest {
 
     @Test
     void getUserByIdWhen_200_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.getUserById(anyLong()))
                 .thenReturn(ResponseEntity.ok(userDto));
@@ -161,7 +161,7 @@ class UserControllerTest {
 
     @Test
     void updateUserWhen_200_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.updateUser(anyLong(), any()))
                 .thenReturn(ResponseEntity.ok(userDto));
@@ -179,7 +179,7 @@ class UserControllerTest {
 
     @Test
     void updateUserWhen_404_error() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.updateUser(anyLong(), any()))
                 .thenThrow(UserClientNotFoundException.class);
@@ -194,7 +194,7 @@ class UserControllerTest {
 
     @Test
     void updateUserWhen_500_error() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.updateUser(anyLong(), any()))
                 .thenThrow(RuntimeException.class);
@@ -209,7 +209,7 @@ class UserControllerTest {
 
     @Test
     void deleteUserWhen_200_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         doNothing().when(userService).deleteUser(anyLong());
 
@@ -223,7 +223,7 @@ class UserControllerTest {
 
     @Test
     void deleteUserWhen_404_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         doThrow(UserClientNotFoundException.class).when(userService).deleteUser(anyLong());
 
@@ -237,7 +237,7 @@ class UserControllerTest {
 
     @Test
     void deleteUserWhen_500_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         doThrow(RuntimeException.class).when(userService).deleteUser(anyLong());
 
@@ -251,7 +251,7 @@ class UserControllerTest {
 
     @Test
     void getAllUsersWhen_200_OK() throws Exception {
-        UserClientDto userDto = UserTestData.getUserDto();
+        UserDto userDto = UserTestData.getUserDto();
         objectMapper.registerModule(new JavaTimeModule());
         when(userService.getAllUsers())
                 .thenReturn(ResponseEntity.ok(List.of(userDto)));

@@ -14,8 +14,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import ru.practicum.shareit.comment.dto.CommentClientDto;
 import ru.practicum.shareit.data.ItemTestData;
-import ru.practicum.shareit.item.dto.ItemClientDto;
 import ru.practicum.shareit.item.dto.ItemClientWithBooking;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ class ItemClientTest {
 
     @Test
     void createItem() throws JsonProcessingException {
-        ItemClientDto itemClientDto = ItemTestData.getItemDto();
+        ItemDto itemClientDto = ItemTestData.getItemDto();
         String body = objectMapper.writeValueAsString(itemClientDto);
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX))
@@ -57,7 +57,7 @@ class ItemClientTest {
 
     @Test
     void createItemWhenUserNotFound() {
-        ItemClientDto itemClientDto = ItemTestData.getItemDto();
+        ItemDto itemClientDto = ItemTestData.getItemDto();
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX))
                 .andExpect(method(HttpMethod.POST))
@@ -69,7 +69,7 @@ class ItemClientTest {
 
     @Test
     void updateItemDto() throws JsonProcessingException {
-        ItemClientDto itemClientDto = ItemTestData.getItemDto();
+        ItemDto itemClientDto = ItemTestData.getItemDto();
         String body = objectMapper.writeValueAsString(itemClientDto);
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX
@@ -86,7 +86,7 @@ class ItemClientTest {
 
     @Test
     void updateItemDtoWhenBadReq() {
-        ItemClientDto itemClientDto = ItemTestData.getItemDto();
+        ItemDto itemClientDto = ItemTestData.getItemDto();
 
         this.mockRestServiceServer.expect(requestTo("test-url" + API_PREFIX
                         + "/" + itemClientDto.getId()))
@@ -164,7 +164,7 @@ class ItemClientTest {
 
     @Test
     void searchItems() throws JsonProcessingException {
-        ItemClientDto itemClientDto = ItemTestData.getItemDto();
+        ItemDto itemClientDto = ItemTestData.getItemDto();
         String body = objectMapper.writeValueAsString(List.of(itemClientDto));
         String path = String.format("/search?from=%s&size=%s&text=%s", 0, 1, "test");
 
